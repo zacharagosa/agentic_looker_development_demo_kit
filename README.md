@@ -4,12 +4,9 @@ Welcome to the **Looker Customer Engineering (CE) Agentic Demo Kit**. This kit e
 
 ---
 
-## 🏗️ Standard CE Demo Architecture
+## ⚡ Zero Dead-Air Meeting Strategy
 
-All Looker CEs use a single standardized architecture:
-- **Cloudtop**: Linux workstation hosting your local workspace, scripts, and CLI tools (accessed via SSH).
-- **Argolis Environment**: Your assigned Argolis GCP project (`go/argolis`) hosting BigQuery datasets and your Argolis Looker Core instance (`go/looker-argolis`).
-- **Jetski Web**: Interactive browser UI (`go/jetski`) for conducting live agentic coding and dashboard generation in front of customers.
+To eliminate presentation dead air while Jetski executes (~2–3 minutes), the CE **kicks off Jetski Web right at Minute 1**, then presents a 3-slide "Under the Hood Architecture" walkthrough (covering LookML governance, Looker Skills & MCP Server, and `looker-cli` compiler validation) while Jetski builds seamlessly in the background!
 
 ---
 
@@ -17,32 +14,36 @@ All Looker CEs use a single standardized architecture:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 1: One-Time Environment Setup                                             │
-│  Provision Cloudtop, Argolis Looker, and Jetski Web. SSH to Cloudtop and auth.   │
-└────────────────────────┬─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: Pre-Demo Readiness Check (5 Mins Before Meeting)                       │
+│  PHASE 1: Pre-Demo Readiness Check (5 Mins Before Call)                          │
 │  Run python3 scripts/ce_preflight_check.py to verify Argolis tokens & connection │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: Live Customer Discovery & Data Source Selection (Mins 0-2 of Call)     │
-│  Ask 3 discovery questions -> Select Option A (Custom), B (Looker Demo), or C (CSV)│
+│  PHASE 2: Quick Customer Alignment (Min 0-1 of Call)                             │
+│  Ask 2 discovery questions -> Formulate prompt template                          │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 4: Live Agentic Build & CE Narrative via Jetski Web (Mins 2-5 of Call)    │
-│  Prompt Jetski Web -> Agent builds BigQuery tables, LookML, and Looker Dashboard │
+│  PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (Mins 1-4 of Call) │
+│  ⚡ KICK OFF JETSKI WEB AT MINUTE 1 ⚡                                            │
+│  While Jetski builds in background, present 3 key architecture tools:           │
+│  1. Looker Semantic Layer (LookML) vs Raw LLM SQL                                │
+│  2. Looker Skills & Model Context Protocol (MCP Server)                          │
+│  3. Looker CLI (`looker-cli`) & Zero-Error Compiler Validation                   │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 5-10)          │
-│  Open dashboard URL -> Invite customer challenges -> Prompt Jetski Web for edits │
+│  PHASE 4: Reveal Generated Looker Dashboard (Min 4 of Call)                      │
+│  Open generated UDD dashboard link live in Argolis Looker UI                     │
+└────────────────────────┬─────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 4-10 of Call) │
+│  Invite customer challenges -> Prompt Jetski Web for live real-time edits        │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -54,43 +55,41 @@ All Looker CEs use a single standardized architecture:
 looker-ce-demo-kit/
 ├── README.md                          # Master overview and 5-phase journey
 ├── ce_environment_setup.md            # Phase 1: One-Time Setup Guide (Provisioning, SSH, Cloudtop, Argolis)
-├── ce_demo_playbook.md                # Full presentation script, talking points, & narrative guide
+├── ce_demo_playbook.md                # Full presentation script, 3-slide walkthrough, & narrative guide
 ├── scripts/
-│   ├── ce_preflight_check.py          # Phase 2: Automated environment readiness check script
-│   └── generate_demo_data.py          # Phase 4: Dynamic multi-table schema & synthetic data generator
+│   ├── ce_preflight_check.py          # Phase 1: Automated environment readiness check script
+│   └── generate_demo_data.py          # Phase 3: Dynamic multi-table schema & synthetic data generator
 ├── skills/
 │   └── generating-demo-data-for-looker/
-│       └── SKILL.md                   # Phase 4: Custom Jetski skill for data discovery & BQ loading
+│       └── SKILL.md                   # Phase 3: Custom Jetski skill for data discovery & BQ loading
 └── templates/
-    ├── custom_live_demo.md            # Phase 3: Data source selection & interactive prompt template
-    ├── telecom_demo.md                # Phase 3: Telecom & 5G network performance analytics scenario
-    ├── ecommerce_demo.md              # Phase 3: Pre-packaged E-Commerce prompt template
-    └── saas_demo.md                   # Phase 3: Pre-packaged SaaS ARR prompt template
+    ├── custom_live_demo.md            # Phase 2: Data source selection & interactive prompt template
+    ├── telecom_demo.md                # Phase 2: Telecom & 5G network performance analytics scenario
+    ├── ecommerce_demo.md              # Phase 2: Pre-packaged E-Commerce prompt template
+    └── saas_demo.md                   # Phase 2: Pre-packaged SaaS ARR prompt template
 ```
 
 ---
 
 ## ⚡ Quick Reference: How to Execute Each Phase
 
-### Phase 1: One-Time Setup & Provisioning
-Provision platforms via [go/cloudtop](http://go/cloudtop), [go/argolis](http://go/argolis), and [go/jetski](http://go/jetski). SSH into Cloudtop and authenticate:
-```bash
-ssh <your-ldap>@<your-cloudtop-hostname>.c.googlers.com
-gcloud auth login   # Use Argolis User Account (NOT @google.com)
-looker-cli session login --oauth
-```
-
-### Phase 2: Pre-Demo Readiness Check (5 mins before call)
+### Phase 1: Pre-Demo Readiness Check (5 mins before call)
 Run the health check script on Cloudtop:
 ```bash
 python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
 ```
 
-### Phase 3: Live Customer Discovery (Mins 0–2 of call)
-Ask the 3 discovery questions and choose your scenario prompt (e.g. `templates/telecom_demo.md` or `templates/custom_live_demo.md`).
+### Phase 2: Quick Customer Alignment (Min 0–1 of call)
+Ask 2 quick questions and choose your scenario prompt (e.g. `templates/telecom_demo.md` or `templates/custom_live_demo.md`).
 
-### Phase 4: Live Agentic Build & Narrative via Jetski Web (Mins 2–5 of call)
-Send prompt to **Jetski Web**. Narrate Looker's semantic layer governance while Jetski builds.
+### Phase 3: Kick Off Agent & Tools Walkthrough (Mins 1–4 of call)
+**Send prompt to Jetski Web at Minute 1**. Switch screen to your slides and walk through:
+1. LookML Semantic Governance vs Raw LLM SQL
+2. Looker Skills & Model Context Protocol (MCP Server)
+3. Looker CLI (`looker-cli`) & Zero-Error Compiler Validation
 
-### Phase 5: Live Dashboard Demo & Iteration (Mins 5–10 of call)
-Open the generated Looker URL in your browser, ask the customer for a live modification, and prompt **Jetski Web** to update the LookML/Dashboard in real time.
+### Phase 4: Reveal Dashboard (Min 4 of call)
+Open the generated Looker URL returned by Jetski Web in your browser.
+
+### Phase 5: Live Customer Iteration (Mins 4–10 of call)
+Ask the customer for a live modification, and prompt **Jetski Web** to update the LookML/Dashboard in real time!
