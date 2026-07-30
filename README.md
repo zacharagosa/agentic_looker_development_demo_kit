@@ -10,6 +10,14 @@ To eliminate presentation dead air while Jetski executes (~2–3 minutes), the C
 
 ---
 
+## 🛡️ What is "Zero-Error Compiler Validation"?
+
+Unlike traditional LLM-to-SQL tools that generate un-verified text queries, Jetski executes an automated two-step quality assurance loop:
+1. **Step 1: LookML Compiler Validation (`validate_project`)**: Jetski calls Looker's official compiler API using `looker-cli`. If the compiler reports any syntax error, missing join, or broken field reference, **Jetski intercepts the error log and self-heals by rewriting the LookML automatically** until Looker returns `0 errors`.
+2. **Step 2: Inline SQL Runtime Verification**: Once compiled cleanly, Jetski executes a real test query against BigQuery (`runquery`) to prove that the underlying SQL executes without runtime database errors.
+
+---
+
 ## 🗺️ The 5-Phase Linear Demo Journey
 
 ```
@@ -53,9 +61,9 @@ To eliminate presentation dead air while Jetski executes (~2–3 minutes), the C
 
 ```
 looker-ce-demo-kit/
-├── README.md                          # Master overview and 5-phase journey
+├── README.md                          # Master overview, Zero-Error definition, & 5-phase journey
 ├── ce_environment_setup.md            # Phase 1: One-Time Setup Guide (Provisioning, SSH, Cloudtop, Argolis)
-├── ce_demo_playbook.md                # Full presentation script, 3-slide walkthrough, & narrative guide
+├── ce_demo_playbook.md                # Full presentation script, 3-slide walkthrough, & Zero-Error guide
 ├── scripts/
 │   ├── ce_preflight_check.py          # Phase 1: Automated environment readiness check script
 │   └── generate_demo_data.py          # Phase 3: Dynamic multi-table schema & synthetic data generator
