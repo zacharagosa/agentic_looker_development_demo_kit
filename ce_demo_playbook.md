@@ -10,14 +10,14 @@ To eliminate dead air while Jetski executes (~2–3 minutes), the CE kicks off t
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 1: Pre-Demo Readiness Check (5 Mins Before Call)                          │
-│  Run python3 scripts/ce_preflight_check.py on Cloudtop to verify tokens & connection│
+│  PHASE 1: Pre-Demo Readiness & Prompt Outline (Before Call)                      │
+│  Run preflight check -> Pre-fill prompt template outline & planned approach      │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: Quick Customer Alignment (Min 0–1 of Call)                             │
-│  Ask 2 discovery questions -> Select Option A (Custom), B (Looker Demo), or C (CSV)│
+│  PHASE 2: Customer Alignment & Prompt Confirmation (Min 0–1 of Call)             │
+│  Walk through pre-filled template w/ customer -> Adjust prompt on the fly        │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
@@ -45,33 +45,33 @@ To eliminate dead air while Jetski executes (~2–3 minutes), the CE kicks off t
 
 ---
 
-## PHASE 1: Pre-Demo Readiness Check (5 Minutes Before Call)
+## PHASE 1: Pre-Demo Readiness & Prompt Outline (Before Call)
 
 ### Goal
-Perform a 5-second health check on your Cloudtop to verify active tokens, Argolis database connections, and permissions before jumping on the call.
+Perform a health check on your Cloudtop to verify active tokens and Argolis database connections, and **create an initial outline of your prompt template ahead of the call**. Coming prepared with a general template filled out and a planned approach ensures a smooth, professional discussion.
 
 ### CE Actions
-Run the automated pre-flight health check script on your Cloudtop:
+1. **Run Pre-Flight Check**:
 ```bash
-python3 /usr/local/google/home/aragosa/.gemini/jetski/scratch/looker-ce-demo-kit/scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
+python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
 ```
+2. **Draft & Outline Prompt Template Ahead of Call**:
+   - Choose a starting template from [`templates/`](templates/) (e.g., [`telecom_demo.md`](templates/telecom_demo.md), [`custom_live_demo.md`](templates/custom_live_demo.md), or [`ecommerce_demo.md`](templates/ecommerce_demo.md)).
+   - Pre-fill the template with your baseline approach, anticipated tables/metrics, and use-case assumptions so you come to the meeting prepared.
 
 ---
 
-## PHASE 2: Quick Customer Alignment (Min 0–1 of Call)
+## PHASE 2: Customer Alignment & Prompt Confirmation (Min 0–1 of Call)
 
 ### Goal
-Align with the customer in 60 seconds on their industry domain and select the appropriate prompt template.
+Walk through your pre-filled prompt template with the customer at the start of the call to confirm the approach and make any on-the-fly adjustments before execution.
 
 ### CE Actions
-Ask the customer these **2 Quick Questions**:
-1. *"What is your primary business domain?"* (e.g. Retail, Telecom, SaaS, Healthcare, Financial)
-2. *"What are 2–3 key metrics your executives care about most?"* (e.g. Revenue, ARPU, Churn, AOV)
-
-### Select Prompt Template
-- **Option A (Dynamic Custom Domain)**: Use [`templates/custom_live_demo.md`](file:///usr/local/google/home/aragosa/.gemini/jetski/scratch/looker-ce-demo-kit/templates/custom_live_demo.md) for custom industries like Telecom, Healthcare, Gaming.
-- **Option B (`looker-private-demo` Public Datasets)**: Use [`templates/ecommerce_demo.md`](file:///usr/local/google/home/aragosa/.gemini/jetski/scratch/looker-ce-demo-kit/templates/ecommerce_demo.md) for curated datasets (`ecom`, `thelook`, `saas`).
-- **Option C (Customer CSVs)**: Pass paths to sample CSV files.
+1. **Share & Confirm the Template**: Show the customer the general prompt outline you prepared ahead of the call.
+2. **Ask Discovery & Alignment Questions**:
+   - *"We prepared this baseline outline for [Industry/Domain] focusing on [Entities] and [KPIs]. Does this approach and structure align with what your team wants to see today?"*
+   - *"Are there any specific metrics or dimensions you'd like us to adjust or add to this prompt before we kick it off?"*
+3. **Make Live Adjustments**: Modify any fields, KPIs, or wording in the template on the fly based on customer feedback before submitting to Jetski.
 
 ---
 
@@ -157,8 +157,8 @@ Demonstrate real-time agile modifications live in front of the customer based on
 
 | Phase | Time | Main CE Action | Primary Tool / Script | Key Output / Milestone |
 | :--- | :--- | :--- | :--- | :--- |
-| **Phase 1** | Pre-Call | Run 5-sec readiness check | `python3 scripts/ce_preflight_check.py` | Green `[PASS]` status |
-| **Phase 2** | Min 0–1 | Ask 2 questions & pick template | `templates/custom_live_demo.md` | Formatted prompt ready |
+| **Phase 1** | Pre-Call | Run readiness check & pre-fill prompt outline | `python3 scripts/ce_preflight_check.py` + `templates/` | Green `[PASS]` & prompt outline ready |
+| **Phase 2** | Min 0–1 | Walk through & confirm pre-filled prompt | Pre-filled prompt template | Aligned prompt adjusted on the fly |
 | **Phase 3** | Min 1–4 | **Kick off Jetski Web** & walk through 3 slides | Slide Deck (LookML, MCP, `looker-cli`) | Agent builds in background without dead air |
 | **Phase 4** | Min 4 | Open generated Looker UDD URL | Argolis Looker Core UI | Reveal live interactive dashboard |
 | **Phase 5** | Min 4–10 | Invite customer edits & prompt agent | Jetski Web + Looker Core UI | Real-time agile modification wow-factor |

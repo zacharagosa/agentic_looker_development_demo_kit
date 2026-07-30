@@ -24,7 +24,7 @@ Use when the customer asks for a custom domain (e.g., *Logistics*, *Healthcare E
 1. Design a multi-table relational schema JSON (with primary keys, foreign keys, metrics, dimensions, timestamps).
 2. Execute the synthetic generator script:
    ```bash
-   python3 /usr/local/google/home/aragosa/.gemini/jetski/scratch/looker-ce-demo-kit/scripts/generate_demo_data.py \
+   python3 scripts/generate_demo_data.py \
      --output-dir /tmp/demo_data \
      --schema-json '{ ... JSON_STRING ... }'
    ```

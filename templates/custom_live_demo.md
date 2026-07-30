@@ -17,11 +17,15 @@ Before prompting Jetski, choose **where the demo data will come from**:
 
 ---
 
-## 2. Live Customer Discovery Checklist (2 Minutes)
-Ask the customer these 3 questions at the start of the meeting:
-1. **Industry & Domain**: *"What is your core business domain?"* (e.g. Retail/E-Commerce, Logistics, SaaS ARR, Healthcare, Financial Services)
-2. **Key Entities & Tables**: *"What are 2-3 main entities you track?"* (e.g. Orders, Users, Products OR Accounts, Subscriptions, MRR Events)
-3. **Target KPIs**: *"What top 3 numbers do your executives care about most?"* (e.g. Total Revenue, Order Volume, AOV, Churn Rate)
+## 2. Pre-Meeting Preparation & Live Confirmation (2 Minutes)
+1. **Pre-Meeting Preparation (Ahead of Call)**:
+   - Draft an initial outline of your prompt template with a baseline approach and assumed entities/KPIs for the customer's domain so you come to the meeting prepared.
+2. **Live Customer Confirmation (Min 0–1 of Call)**:
+   - Walk through your pre-filled prompt outline with the customer at the start of the call to confirm the approach:
+     - *"We prepared this baseline outline for [Industry/Domain] focusing on [Entities] and [KPIs]. Does this align with what your team wants to see today?"*
+     - *"Are there any specific adjustments or additional metrics you'd like us to change in this template before we kick it off?"*
+3. **Adjust on the Fly**:
+   - Make any live edits to the template based on customer feedback before submitting to Jetski.
 
 ---
 

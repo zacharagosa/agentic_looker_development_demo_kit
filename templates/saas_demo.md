@@ -7,6 +7,7 @@ Demonstrate how Looker's agentic model building handles complex business logic l
 - **BigQuery Data Source**: Project `looker-private-demo`, Dataset `saas` (or `saas_events`)
 - **Looker Connection**: `{your_looker_connection_name}`
 - **Looker Project**: `agentic_saas_demo`
+- **Pre-Call Preparation**: Pre-fill this template outline with baseline assumptions ahead of the call. Walk through it with the customer at Min 0–1 to confirm the approach and make any adjustments on the fly.
 
 ## Prompt to Copy-Paste into Jetski during Live Demo
 > "Jetski, we are demoing Looker agentic LookML for a SaaS B2B customer using the `looker-private-demo` BigQuery project dataset `saas`.

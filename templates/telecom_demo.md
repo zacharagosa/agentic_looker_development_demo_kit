@@ -11,6 +11,7 @@ Showcase how Looker and Jetski can build an end-to-end Telecom & 5G Network Anal
 - **Target BigQuery Dataset**: `demo_telecom_analytics`
 - **Looker Connection**: `{your_looker_bq_connection_name}`
 - **Looker Project**: `telecom_network_analytics`
+- **Pre-Call Preparation**: Pre-fill this template outline with baseline assumptions ahead of the call. Walk through it with the customer at Min 0–1 to confirm the approach and make any adjustments on the fly.
 
 ---
 

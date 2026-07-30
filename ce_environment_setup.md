@@ -197,4 +197,4 @@ Once your environment setup is complete, run the automated readiness check scrip
 python3 scripts/ce_preflight_check.py --connection-name <your_looker_connection_name>
 ```
 
-Return to [ce_demo_playbook.md](file:///usr/local/google/home/aragosa/.gemini/jetski/scratch/looker-ce-demo-kit/ce_demo_playbook.md) for the 5-phase live demo guide.
+Return to [ce_demo_playbook.md](ce_demo_playbook.md) for the 5-phase live demo guide.

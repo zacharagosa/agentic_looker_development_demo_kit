@@ -7,6 +7,7 @@ Showcase how Looker can transform raw e-commerce order logs and customer profile
 - **BigQuery Data Source**: Project `looker-private-demo`, Dataset `ecom` (or `thelook`)
 - **Looker Connection**: `{your_looker_connection_name}` (connected to `looker-private-demo` or Argolis BQ)
 - **Looker Project**: `agentic_ecommerce_demo`
+- **Pre-Call Preparation**: Pre-fill this template outline with baseline assumptions ahead of the call. Walk through it with the customer at Min 0–1 to confirm the approach and make any adjustments on the fly.
 
 ## Prompt to Copy-Paste into Jetski during Live Demo
 > "Jetski, we are doing a live demonstration of Looker's agentic coding capabilities using the standard `looker-private-demo` BigQuery project dataset `ecom`.
