@@ -2,42 +2,23 @@
 
 Welcome to the **Looker Customer Engineering Agentic Demo Kit**. This kit equips CEs to deliver live, end-to-end demonstrations showing how **Looker** powered by Agentic AI accelerates BI development from zero to an interactive dashboard in under 10 minutes.
 
+---
+
 ## 🗺️ Looker Demo Steps
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 1: Pre-Demo Readiness & Prompt Outline (Before Call)                      │
-│  Run preflight check -> Pre-fill prompt template outline & planned approach      │
-└────────────────────────┬─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: Customer Alignment & Prompt Confirmation (Min 0-1 of Call)             │
-│  Walk through pre-filled template w/ customer -> Adjust prompt on the fly        │
-└────────────────────────┬─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (Mins 1-4 of Call) │
-│  ⚡ KICK OFF JETSKI WEB AT MINUTE 1 ⚡                                            │
-│  While Jetski builds in background, present 3 key architecture tools:           │
-│  1. Looker Semantic Layer (LookML) vs Raw LLM SQL                                │
-│  2. Looker Skills & Model Context Protocol (MCP Server)                          │
-│  3. Looker CLI (`looker-cli`) & Zero-Error Compiler Validation                   │
-└────────────────────────┬─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 4: Reveal Generated Looker Dashboard (Min 4 of Call)                      │
-│  Open generated UDD dashboard link live in Argolis Looker UI                     │
-└────────────────────────┬─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 4-10 of Call) │
-│  Invite customer challenges -> Prompt Jetski Web for live real-time edits        │
-└──────────────────────────────────────────────────────────────────────────────────┘
-```
+- **Phase 1: Pre-Demo Readiness & Prompt Outline (Before Call)**  
+  Run the pre-flight check script on Cloudtop (`scripts/ce_preflight_check.py`) and pre-fill a prompt template outline with your planned approach and use-case assumptions.
+- **Phase 2: Customer Alignment & Prompt Confirmation (Min 0–1 of Call)**  
+  Walk through the pre-filled prompt template with the customer to confirm the approach, asking discovery questions and adjusting the prompt on the fly before executing.
+- **Phase 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (Mins 1–4 of Call)**  
+  **Kick off Jetski Web at Minute 1**. While the agent builds in the background, present the 3 key architecture tools:
+  1. Looker Semantic Layer (LookML) vs Raw LLM SQL
+  2. Looker Skills & Model Context Protocol (MCP Server)
+  3. Looker CLI (`looker-cli`) & Zero-Error Compiler Validation
+- **Phase 4: Reveal Generated Looker Dashboard (Min 4 of Call)**  
+  Open the completed User-Defined Dashboard (UDD) link live in your Argolis Looker UI.
+- **Phase 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 4–10 of Call)**  
+  Invite customer challenges and prompt Jetski Web to make real-time LookML and dashboard edits on the fly.
 
 ---
 
@@ -45,7 +26,7 @@ Welcome to the **Looker Customer Engineering Agentic Demo Kit**. This kit equips
 
 ```
 looker-ce-demo-kit/
-├── README.md                          # Master overview, Zero-Error definition, & 5-phase journey
+├── README.md                          # Master overview & 5-phase demo journey
 ├── ce_environment_setup.md            # Phase 1: One-Time Setup Guide (Provisioning, SSH, Cloudtop, Argolis)
 ├── ce_demo_playbook.md                # Full presentation script, 3-slide walkthrough, & Zero-Error guide
 ├── scripts/
@@ -67,9 +48,9 @@ looker-ce-demo-kit/
 
 ### Phase 1: Pre-Demo Readiness & Prompt Outline (Before Call)
 1. **Verify Environment Health**: Run the pre-flight check script on Cloudtop:
-```bash
-python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
-```
+   ```bash
+   python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
+   ```
 2. **Draft Prompt Outline**: Ahead of the meeting, select a template (e.g. `templates/telecom_demo.md` or `templates/custom_live_demo.md`) and pre-fill a general outline with your baseline approach and use-case assumptions so you come to the meeting prepared.
 
 ### Phase 2: Customer Alignment & Prompt Confirmation (Min 0–1 of call)
@@ -86,19 +67,3 @@ Open the generated Looker URL returned by Jetski Web in your browser.
 
 ### Phase 5: Live Customer Iteration (Mins 4–10 of call)
 Ask the customer for a live modification, and prompt **Jetski Web** to update the LookML/Dashboard in real time!
-
----
-
-## ⚡ Zero Dead-Air Meeting Strategy
-
-To eliminate presentation dead air while Jetski executes (~2–3 minutes), the CE **kicks off Jetski Web right at Minute 1**, then presents a 3-slide "Under the Hood Architecture" walkthrough (covering LookML governance, Looker Skills & MCP Server, and `looker-cli` compiler validation) while Jetski builds seamlessly in the background!
-
----
-
-## 🛡️ What is "Zero-Error Compiler Validation"?
-
-Unlike traditional LLM-to-SQL tools that generate un-verified text queries, Jetski executes an automated two-step quality assurance loop:
-1. **Step 1: LookML Compiler Validation (`validate_project`)**: Jetski calls Looker's official compiler API using `looker-cli`. If the compiler reports any syntax error, missing join, or broken field reference, **Jetski intercepts the error log and self-heals by rewriting the LookML automatically** until Looker returns `0 errors`.
-2. **Step 2: Inline SQL Runtime Verification**: Once compiled cleanly, Jetski executes a real test query against BigQuery (`runquery`) to prove that the underlying SQL executes without runtime database errors.
-
----
