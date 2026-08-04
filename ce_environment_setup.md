@@ -2,7 +2,7 @@
 
 Welcome to the **Phase 1 Environment Setup Guide** for Looker Customer Engineers (CEs). Before delivering live, agentic Looker demonstrations with **Jetski**, you need your Cloudtop environment properly configured with authenticated Google Cloud (Argolis) and Looker CLI tools.
 
-This one-time setup typically takes **5–10 minutes**. Once configured, your environment is ready for repeated customer demonstrations.
+This is a brief one-time setup. Once configured, your environment is ready for repeated customer demonstrations.
 
 ---
 

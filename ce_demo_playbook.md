@@ -6,7 +6,7 @@ This playbook provides a **linear, 5-phase journey** for Customer Engineers (CEs
 
 ## 🗺️ Optimized Customer Meeting Flow & Timeline
 
-To eliminate dead air while Jetski executes (~2–3 minutes), the CE kicks off the agent prompt **right at Minute 1**, then walks through a 3-slide "Under the Hood Architecture" presentation while Jetski operates seamlessly in the background.
+To eliminate dead air while Jetski executes, the CE kicks off the agent prompt **immediately after customer alignment**, then walks through a 3-slide "Under the Hood Architecture" presentation while Jetski operates seamlessly in the background.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
@@ -16,14 +16,14 @@ To eliminate dead air while Jetski executes (~2–3 minutes), the CE kicks off t
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: Customer Alignment & Prompt Confirmation (Min 0–1 of Call)             │
+│  PHASE 2: Customer Alignment & Prompt Confirmation (Start of Call)               │
 │  Walk through pre-filled template w/ customer -> Adjust prompt on the fly        │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (Mins 1–4 of Call) │
-│  ⚡ KICK OFF JETSKI WEB AT MINUTE 1 ⚡                                            │
+│  PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (During Execution) │
+│  ⚡ KICK OFF JETSKI WEB IMMEDIATELY AFTER ALIGNMENT ⚡                           │
 │  While Jetski builds in background, present 3 key architecture tools:           │
 │  1. Looker Semantic Layer (LookML) vs Raw LLM SQL                                │
 │  2. Looker Skills & Model Context Protocol (MCP Server)                          │
@@ -32,13 +32,13 @@ To eliminate dead air while Jetski executes (~2–3 minutes), the CE kicks off t
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 4: Reveal Generated Looker Dashboard (Min 4 of Call)                      │
+│  PHASE 4: Reveal Generated Looker Dashboard (Dashboard Reveal)                   │
 │  Open generated UDD dashboard link live in Argolis Looker UI                     │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 4–10 of Call) │
+│  PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Live Iteration)    │
 │  Invite customer challenges -> Prompt Jetski Web for live real-time edits        │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -61,7 +61,7 @@ python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connecti
 
 ---
 
-## PHASE 2: Customer Alignment & Prompt Confirmation (Min 0–1 of Call)
+## PHASE 2: Customer Alignment & Prompt Confirmation (Start of Call)
 
 ### Goal
 Walk through your pre-filled prompt template with the customer at the start of the call to confirm the approach and make any on-the-fly adjustments before execution.
@@ -75,17 +75,17 @@ Walk through your pre-filled prompt template with the customer at the start of t
 
 ---
 
-## PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (Mins 1–4)
+## PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (During Agent Execution)
 
 ### Goal
-**Kick off Jetski Web immediately at Minute 1**, then present a brief, high-value 3-part tools walkthrough while Jetski builds the BigQuery tables, LookML, and dashboard in the background.
+**Kick off Jetski Web immediately after customer alignment**, then present a brief, high-value 3-part tools walkthrough while Jetski builds the BigQuery tables, LookML, and dashboard in the background.
 
-### CE Action at Minute 1
+### CE Action: Kick Off Agent
 Paste your prompt into **Jetski Web** and click Send. Once the agent starts executing, switch your shared screen to your slides/architecture diagram!
 
 ---
 
-### 🎙️ CE Presentation Narrative & Slide Script (Mins 1–4)
+### 🎙️ CE Presentation Narrative & Slide Script (During Agent Execution)
 
 #### Slide 1: The Foundation — Looker Semantic Layer (LookML) vs Raw SQL
 > *"While Jetski is building our solution live in BigQuery and Looker, let's talk about why agentic AI works so well with Looker compared to other BI platforms.*
@@ -125,7 +125,7 @@ Paste your prompt into **Jetski Web** and click Send. Once the agent starts exec
 
 ---
 
-## PHASE 4: Reveal Generated Looker Dashboard (Min 4 of Call)
+## PHASE 4: Reveal Generated Looker Dashboard (Dashboard Reveal)
 
 ### Goal
 Switch back to your browser window and present the completed, fully modeled Looker dashboard URL generated by Jetski Web.
@@ -139,14 +139,14 @@ Switch back to your browser window and present the completed, fully modeled Look
 
 ---
 
-## PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Mins 4–10 of Call)
+## PHASE 5: Live Dashboard Demo & Real-Time Customer Iteration (Live Iteration)
 
 ### Goal
 Demonstrate real-time agile modifications live in front of the customer based on their direct feedback.
 
 ### CE Actions
 1. Turn to the customer and ask:
-   > *"Now that we've built a baseline solution in 3 minutes, what additional metric, drill path, or visual calculation would you like to see added?"*
+   > *"Now that we've built a baseline solution, what additional metric, drill path, or visual calculation would you like to see added?"*
 2. Feed their request into **Jetski Web** in plain English:
    > *"Jetski, add a gross margin % measure to the view, group top categories in a stacked bar chart, and add a status filter to the dashboard."*
 3. Refresh the Looker dashboard live to reveal the updated visualization!
@@ -155,10 +155,10 @@ Demonstrate real-time agile modifications live in front of the customer based on
 
 ## Summary Matrix: Phases, Tools & Actions
 
-| Phase | Time | Main CE Action | Primary Tool / Script | Key Output / Milestone |
+| Phase | Stage | Main CE Action | Primary Tool / Script | Key Output / Milestone |
 | :--- | :--- | :--- | :--- | :--- |
 | **Phase 1** | Pre-Call | Run readiness check & pre-fill prompt outline | `python3 scripts/ce_preflight_check.py` + `templates/` | Green `[PASS]` & prompt outline ready |
-| **Phase 2** | Min 0–1 | Walk through & confirm pre-filled prompt | Pre-filled prompt template | Aligned prompt adjusted on the fly |
-| **Phase 3** | Min 1–4 | **Kick off Jetski Web** & walk through 3 slides | Slide Deck (LookML, MCP, `looker-cli`) | Agent builds in background without dead air |
-| **Phase 4** | Min 4 | Open generated Looker UDD URL | Argolis Looker Core UI | Reveal live interactive dashboard |
-| **Phase 5** | Min 4–10 | Invite customer edits & prompt agent | Jetski Web + Looker Core UI | Real-time agile modification wow-factor |
+| **Phase 2** | Start of Call | Walk through & confirm pre-filled prompt | Pre-filled prompt template | Aligned prompt adjusted on the fly |
+| **Phase 3** | During Execution | **Kick off Jetski Web** & walk through 3 slides | Slide Deck (LookML, MCP, `looker-cli`) | Agent builds in background without dead air |
+| **Phase 4** | Dashboard Reveal | Open generated Looker UDD URL | Argolis Looker Core UI | Reveal live interactive dashboard |
+| **Phase 5** | Live Iteration | Invite customer edits & prompt agent | Jetski Web + Looker Core UI | Real-time agile modification wow-factor |

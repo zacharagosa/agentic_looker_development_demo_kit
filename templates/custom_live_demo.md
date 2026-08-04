@@ -17,10 +17,10 @@ Before prompting Jetski, choose **where the demo data will come from**:
 
 ---
 
-## 2. Pre-Meeting Preparation & Live Confirmation (2 Minutes)
+## 2. Pre-Meeting Preparation & Live Confirmation
 1. **Pre-Meeting Preparation (Ahead of Call)**:
    - Draft an initial outline of your prompt template with a baseline approach and assumed entities/KPIs for the customer's domain so you come to the meeting prepared.
-2. **Live Customer Confirmation (Min 0–1 of Call)**:
+2. **Live Customer Confirmation (Start of Call)**:
    - Walk through your pre-filled prompt outline with the customer at the start of the call to confirm the approach:
      - *"We prepared this baseline outline for [Industry/Domain] focusing on [Entities] and [KPIs]. Does this align with what your team wants to see today?"*
      - *"Are there any specific adjustments or additional metrics you'd like us to change in this template before we kick it off?"*

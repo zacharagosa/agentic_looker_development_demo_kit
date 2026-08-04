@@ -11,7 +11,7 @@ Showcase how Looker and Jetski can build an end-to-end Telecom & 5G Network Anal
 - **Target BigQuery Dataset**: `demo_telecom_analytics`
 - **Looker Connection**: `{your_looker_bq_connection_name}`
 - **Looker Project**: `telecom_network_analytics`
-- **Pre-Call Preparation**: Pre-fill this template outline with baseline assumptions ahead of the call. Walk through it with the customer at Min 0–1 to confirm the approach and make any adjustments on the fly.
+- **Pre-Call Preparation**: Pre-fill this template outline with baseline assumptions ahead of the call. Walk through it with the customer at the start of the call to confirm the approach and make any adjustments on the fly.
 
 ---
 
@@ -55,13 +55,13 @@ Copy and paste the exact prompt below into **Jetski Web** during a customer call
 
 ## 🎙️ CE Presentation Narrative (What to Say While Jetski Builds)
 
-- **Minute 2 (Schema Creation & BQ Load)**:
-  > *"Notice how Jetski designs a normalized telecom schema—subscribers, cell towers, network performance logs, and billing. It generates synthetic data and populates BigQuery dataset `demo_telecom_analytics` in seconds."*
+- **Step 1: Schema Creation & BQ Load**:
+  > *"Notice how Jetski designs a normalized telecom schema—subscribers, cell towers, network performance logs, and billing. It generates synthetic data and populates BigQuery dataset `demo_telecom_analytics` automatically."*
 
-- **Minute 3 (Semantic Layer & Metrics)**:
+- **Step 2: Semantic Layer & Metrics**:
   > *"For a telecom analyst, consistency is critical. Looker's semantic layer centralizes calculations like ARPU and Data Usage in TB so every executive sees the exact same metrics without conflicting SQL scripts."*
 
-- **Minute 4 (Zero-Error Verification)**:
+- **Step 3: Zero-Error Verification**:
   > *"Jetski calls Looker's compiler to validate syntax and executes inline test queries to ensure zero SQL runtime errors before publishing."*
 
 ---
