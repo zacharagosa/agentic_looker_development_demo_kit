@@ -36,6 +36,7 @@ looker-ce-demo-kit/
 │   └── generating-demo-data-for-looker/
 │       └── SKILL.md                   # Phase 3: Custom Jetski skill for data discovery & BQ loading
 └── templates/
+    ├── panera_bread_demo.md           # Phase 1 & 2: Panera Bread fast-casual restaurant & loyalty scenario
     ├── custom_live_demo.md            # Phase 1 & 2: Data source selection & interactive prompt template
     ├── telecom_demo.md                # Phase 1 & 2: Telecom & 5G network performance analytics scenario
     ├── ecommerce_demo.md              # Phase 1 & 2: Pre-packaged E-Commerce prompt template
@@ -51,7 +52,7 @@ looker-ce-demo-kit/
    ```bash
    python3 scripts/ce_preflight_check.py --connection-name {your_looker_bq_connection}
    ```
-2. **Draft Prompt Outline**: Ahead of the meeting, select a template (e.g. `templates/telecom_demo.md` or `templates/custom_live_demo.md`) and pre-fill a general outline with your baseline approach and use-case assumptions so you come to the meeting prepared.
+2. **Draft Prompt Outline**: Ahead of the meeting, select a template (e.g. `templates/panera_bread_demo.md`, `templates/telecom_demo.md`, or `templates/custom_live_demo.md`) and pre-fill a general outline with your baseline approach and use-case assumptions so you come to the meeting prepared.
 
 ### Phase 2: Customer Alignment & Prompt Confirmation (Start of Call)
 When you get on the call, walk through your pre-filled prompt template with the customer to confirm the general approach. Ask discovery questions and make any adjustments to the template on the fly before executing.
