@@ -36,6 +36,7 @@ looker-ce-demo-kit/
 │   └── generating-demo-data-for-looker/
 │       └── SKILL.md                   # Phase 3: Custom Jetski skill for data discovery & BQ loading
 └── templates/
+    ├── tvun_media_demo.md             # Phase 1 & 2: TVUN (TelevisaUnivision) media ad spend & Nielsen analytics
     ├── panera_bread_demo.md           # Phase 1 & 2: Panera Bread fast-casual restaurant & loyalty scenario
     ├── custom_live_demo.md            # Phase 1 & 2: Data source selection & interactive prompt template
     ├── telecom_demo.md                # Phase 1 & 2: Telecom & 5G network performance analytics scenario
