@@ -46,11 +46,11 @@ Copy and paste the exact prompt below into **Jetski Web** during a customer call
 > 4. **Create Model & Validate**:
 >    - Create model file `panera_bread.model.lkml` joining `orders`, `cafes`, `mypanera_members`, `order_items`, and `menu_items`.
 >    - Map the connection `{your_looker_bq_connection_name}`.
->    - Run LookML validation (`validate_project`) and execute a test query to guarantee zero errors.
+>    - Run LookML validation (`validate_project`) and execute a test query to guarantee zero errors, and deploy the project to production.
 > 
 > 5. **Generate Looker Dashboard**:
 >    - Create a LookML dashboard `panera_cafe_performance` featuring KPIs for Total Gross Sales, Order Volume, AOV, Avg Order Prep Time, Sales by Channel (Rapid Pick-Up vs Drive-Thru vs Mobile App), and Sales by Menu Category (Soups, Sandwiches, Bakery).
->    - Import it as a User-Defined Dashboard (UDD) in Looker and return the live URL."
+>    - Import it as a User-Defined Dashboard (UDD) in Looker, ensure all changes are deployed to production, and return the live URL."
 
 ---
 

@@ -45,11 +45,11 @@ Copy and paste the exact prompt below into **Jetski Web** during a customer call
 > 4. **Create Model & Validate**:
 >    - Create model file `telecom_analytics.model.lkml` joining `subscribers`, `network_usage_logs`, `cell_towers`, and `billing_statements`.
 >    - Map the connection `{your_looker_bq_connection_name}`.
->    - Run LookML validation (`validate_project`) and execute a test query to guarantee zero errors.
+>    - Run LookML validation (`validate_project`) and execute a test query to guarantee zero errors, and deploy the project to production.
 > 
 > 5. **Generate Looker Dashboard**:
 >    - Create a LookML dashboard `telecom_network_overview` featuring KPIs for Total Data Usage (TB), Active Subscribers, ARPU, Latency by 5G Technology, and Top Regions by Dropped Calls.
->    - Import it as a User-Defined Dashboard (UDD) in Looker and return the live URL."
+>    - Import it as a User-Defined Dashboard (UDD) in Looker, ensure all changes are deployed to production, and return the live URL."
 
 ---
 

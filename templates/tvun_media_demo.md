@@ -64,7 +64,7 @@ Please execute the following end-to-end workflow:
    - Create model file `tvun_media_analytics.model.lkml` joining `ad_spot_airings`, `advertiser_campaigns`, `broadcast_programming`, and `nielsen_ratings_markets`.
    - Include the `contextual_ad_search` explore.
    - Map the model to connection `{your_looker_bq_connection_name}`.
-   - Run LookML compiler validation (`validate_project`) and execute an inline test query against BigQuery to guarantee zero SQL runtime or compiler errors.
+   - Run LookML compiler validation (`validate_project`) and execute an inline test query against BigQuery, and deploy the project to production.
 
 5. Generate Looker Dashboard:
    - Create a LookML dashboard `tvun_commercial_ratings_overview` with tiles for:
