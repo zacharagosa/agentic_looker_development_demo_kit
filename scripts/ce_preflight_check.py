@@ -140,9 +140,25 @@ def check_looker_cli(target_conn=None):
 
     return True
 
+def check_gchat_webhook(webhook_url=None):
+    print(f"\n{BOLD}4. Checking Closed-Loop Google Chat Alerting Integration:{RESET}")
+    url = webhook_url or os.getenv("GCHAT_WEBHOOK_URL")
+    if not url:
+        log_warn("No Google Chat webhook URL specified. Closed-loop alert escalation will run in dry-run mode.")
+        print(f"     -> Info: Pass --chat-webhook-url or set GCHAT_WEBHOOK_URL to enable real-time alert dispatch.")
+        return True
+
+    if url.startswith("https://chat.googleapis.com/"):
+        log_pass("Google Chat incoming webhook endpoint configured and formatted correctly.")
+        return True
+    else:
+        log_warn(f"Webhook URL does not match standard Google Chat endpoint: {url[:30]}...")
+        return True
+
 def main():
     parser = argparse.ArgumentParser(description="Looker CE Pre-flight Environment Readiness Check")
     parser.add_argument("--connection-name", help="Specific BigQuery connection name in Looker to check")
+    parser.add_argument("--chat-webhook-url", help="Google Chat incoming webhook URL for closed-loop alerting")
     args = parser.parse_args()
 
     print(f"{BOLD}===================================================={RESET}")
@@ -152,12 +168,13 @@ def main():
     gcloud_ok, gcp_project = check_gcloud()
     bq_ok = check_bigquery(gcp_project)
     looker_ok = check_looker_cli(target_conn=args.connection_name)
+    chat_ok = check_gchat_webhook(webhook_url=args.chat_webhook_url)
 
     print(f"\n{BOLD}===================================================={RESET}")
     print(f"{BOLD}                  Readiness Summary                 {RESET}")
     print(f"{BOLD}===================================================={RESET}")
 
-    if gcloud_ok and bq_ok and looker_ok:
+    if gcloud_ok and bq_ok and looker_ok and chat_ok:
         print(f"\n{GREEN}{BOLD}>>> ALL CHECKS PASSED! Your environment is READY for live customer demos. <<<{RESET}\n")
         sys.exit(0)
     else:

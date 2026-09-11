@@ -24,10 +24,11 @@ To eliminate dead air while Jetski executes, the CE kicks off the agent prompt *
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │  PHASE 3: Kick Off Agent & "Under the Hood" Tools Walkthrough (During Execution) │
 │  ⚡ KICK OFF JETSKI WEB IMMEDIATELY AFTER ALIGNMENT ⚡                           │
-│  While Jetski builds in background, present 3 key architecture tools:           │
+│  While Jetski builds in background, present 4 key architecture tools:           │
 │  1. Looker Semantic Layer (LookML) vs Raw LLM SQL                                │
 │  2. Looker Skills & Model Context Protocol (MCP Server)                          │
 │  3. Looker CLI (`looker-cli`) & Zero-Error Compiler Validation                   │
+│  4. Closed-Loop Operations: Looker Actions & Google Chat CardsV2 Alerting        │
 └────────────────────────┬─────────────────────────────────────────────────────────┘
                          │
                          ▼
@@ -125,6 +126,17 @@ Paste your prompt into **Jetski Web** and click Send. Once the agent starts exec
 
 ---
 
+#### Slide 4: Closed-Loop Operations — Looker Actions & Real-Time Google Chat Alerting
+> *"What happens after an insight or operational anomaly is detected? Looker is not merely an analytics reporting dashboard—it acts as an active operational execution plane.*
+> 
+> *Through native **Looker Actions** and Google Chat CardsV2 integrations, business users and operations engineers don't have to context-switch across multiple ticketing portals. With one click directly inside a Looker table cell:*
+> 
+> 1. ***In-Cell Looker Action***: A user clicks 'Escalate to NOC Space' on an incident row or circuit dimension.
+> 2. ***Rich CardsV2 Notification***: Looker executes a webhook calling our dispatcher (`scripts/send_gchat_alert.py`), posting a formatted Google Chat Card containing incident severity, span route, optical dBm attenuation, and financial SLA exposure ($/hr).
+> 3. ***1-Click Deep Drilldown***: Operations engineers in Google Chat click buttons on the card to open the exact filtered Looker dashboard or BigQuery telemetry query, closing the loop from raw event to governed semantic model to business remediation.*
+
+---
+
 ## PHASE 4: Reveal Generated Looker Dashboard (Dashboard Reveal)
 
 ### Goal
@@ -159,6 +171,6 @@ Demonstrate real-time agile modifications live in front of the customer based on
 | :--- | :--- | :--- | :--- | :--- |
 | **Phase 1** | Pre-Call | Run readiness check & pre-fill prompt outline | `python3 scripts/ce_preflight_check.py` + `templates/` | Green `[PASS]` & prompt outline ready |
 | **Phase 2** | Start of Call | Walk through & confirm pre-filled prompt | Pre-filled prompt template | Aligned prompt adjusted on the fly |
-| **Phase 3** | During Execution | **Kick off Jetski Web** & walk through 3 slides | Slide Deck (LookML, MCP, `looker-cli`) | Agent builds in background without dead air |
+| **Phase 3** | During Execution | **Kick off Jetski Web** & walk through 4 slides | Slide Deck (LookML, MCP, `looker-cli`, GChat Alerts) | Agent builds in background without dead air |
 | **Phase 4** | Dashboard Reveal | Open generated Looker UDD URL | Argolis Looker Core UI | Reveal live interactive dashboard |
 | **Phase 5** | Live Iteration | Invite customer edits & prompt agent | Jetski Web + Looker Core UI | Real-time agile modification wow-factor |
