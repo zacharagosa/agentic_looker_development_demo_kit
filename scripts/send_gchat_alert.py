@@ -98,9 +98,7 @@ def build_card_payload(circuit_id: str,
                 "card": {
                     "header": {
                         "title": f"{cfg['badge']}: {circuit_id}",
-                        "subtitle": f"Detected: {ts}{inc_str}",
-                        "imageUrl": cfg["icon"],
-                        "imageType": "SQUARE"
+                        "subtitle": f"Detected: {ts}{inc_str}"
                     },
                     "sections": [
                         {
