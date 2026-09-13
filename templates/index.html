@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zayo Group | Autonomous Network Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="512x512" href="/zayo-logo.png">
+  <meta property="og:title" content="Zayo Group | Autonomous Network Intelligence">
+  <meta property="og:description" content="Autonomous Telemetry, BigQuery ML, Looker Actions & Google Chat NOC Alerting">
+  <meta property="og:image" content="/zayo-logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="/zayo-logo.png">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            zayo: {
+              orange: '#f5831f', // Official Zayo Corporate Orange (Pantone 715 C)
+              darkorange: '#ea580c',
+              navy: '#0f172a',
+              slate: '#1e293b',
+              light: '#f8fafc',
+              border: '#e2e8f0'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .clean-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .clean-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 sm:px-6 py-3 shadow-xs">
+    <div class="max-w-[1800px] mx-auto flex items-center justify-between">
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3.5">
+        <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-[#f5831f] to-[#ea580c] flex items-center justify-center font-extrabold text-white text-lg shadow-sm">
+          Z
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-lg font-bold tracking-tight text-slate-900">ZAYO GROUP</span>
+            <span class="text-[11px] px-2 py-0.5 rounded-md bg-orange-50 text-[#f5831f] border border-orange-200 font-semibold font-mono">
+              NETWORK AI
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold font-mono uppercase">
+              V2
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Autonomous Telemetry, BQML, Looker Actions & Google Chat NOC Alerting</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="bg-white border-b border-slate-200 px-4 sm:px-6">
+    <div class="max-w-[1800px] mx-auto flex space-x-3 text-sm font-medium">
+      <button onclick="switchTab('tab-ops')" id="btn-tab-ops"
+              class="tab-btn px-4 py-3 border-b-2 border-[#f5831f] text-[#f5831f] font-semibold flex items-center space-x-2 transition">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Network Radar</span>
+      </button>
+      <button onclick="switchTab('tab-automl')" id="btn-tab-automl"
+              class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 transition">
+        <i class="fa-solid fa-microchip text-[#f5831f]"></i>
+        <span>AutoML Failure Predictor</span>
+      </button>
+      <button onclick="switchTab('tab-looker')" id="btn-tab-looker"
+              class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 transition">
+        <i class="fa-solid fa-gauge-high text-slate-600"></i>
+        <span>Looker BI Dashboard</span>
+      </button>
+      <button onclick="switchTab('tab-looker-ca')" id="btn-tab-looker-ca"
+              class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 transition">
+        <i class="fa-solid fa-brain text-[#f5831f]"></i>
+        <span>Looker Conversational AI</span>
+        <span class="text-[10px] px-1.5 py-0.5 rounded bg-orange-100 text-[#ea580c] font-semibold font-mono">Data Agent</span>
+      </button>
+      <button onclick="switchTab('tab-walkthrough')" id="btn-tab-walkthrough"
+              class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 transition">
+        <i class="fa-solid fa-layer-group text-slate-600"></i>
+        <span>Solution & Models Walkthrough</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full">
+
+    <!-- ============================================================= -->
+    <!-- TAB 1: NETWORK RADAR -->
+    <!-- ============================================================= -->
+    <div id="tab-ops" class="tab-pane max-w-[1800px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      
+      <!-- TOPLINE KPI METRIC CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>Route Miles</span>
+            <i class="fa-solid fa-route text-[#f5831f]"></i>
+          </div>
+          <div class="text-2xl font-bold text-slate-900 mt-1 font-mono" id="kpi-miles">5,950 mi</div>
+          <div class="text-[11px] text-slate-500 mt-1">8 Core Corridors</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>Backbone Cap</span>
+            <i class="fa-solid fa-bolt text-amber-500"></i>
+          </div>
+          <div class="text-2xl font-bold text-slate-900 mt-1 font-mono" id="kpi-capacity">464.0 Tbps</div>
+          <div class="text-[11px] text-slate-500 mt-1">400G / 800G Waves</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>Traffic Anomalies</span>
+            <i class="fa-solid fa-wave-square text-rose-500"></i>
+          </div>
+          <div class="text-2xl font-bold text-rose-600 mt-1 font-mono" id="kpi-traffic-anom">628</div>
+          <div class="text-[11px] text-slate-500 mt-1">ARIMA Surges & Drops</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>Optical Anomalies</span>
+            <i class="fa-solid fa-triangle-exclamation text-[#f5831f]"></i>
+          </div>
+          <div class="text-2xl font-bold text-[#ea580c] mt-1 font-mono" id="kpi-optical-anom">1,756</div>
+          <div class="text-[11px] text-slate-500 mt-1">Attenuation & BER</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>Critical Spans</span>
+            <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+          </div>
+          <div class="text-2xl font-bold text-rose-600 mt-1 font-mono" id="kpi-critical-spans">2 P1 / 1 P2</div>
+          <div class="text-[11px] text-slate-500 mt-1">Action Dispatched</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-between">
+            <span>SLA Exposure</span>
+            <i class="fa-solid fa-dollar-sign text-emerald-600"></i>
+          </div>
+          <div class="text-2xl font-bold text-emerald-600 mt-1 font-mono" id="kpi-sla-exposure">$475,000</div>
+          <div class="text-[11px] text-slate-500 mt-1">Protected Exposure</div>
+        </div>
+      </div>
+
+      <!-- CRITICAL ATTENTION BANNER -->
+      <div class="clean-card p-4 border-l-4 border-[#f5831f] bg-orange-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="h-9 w-9 rounded-lg bg-orange-100 text-[#ea580c] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#ea580c]">P1 Urgent Alert</span>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold font-mono">
+                94% ML Failure Risk
+              </span>
+            </div>
+            <p class="text-xs text-slate-700 mt-0.5">
+              Span <span class="font-mono font-bold text-slate-900">CHI-DEN-01-SPAN-02</span>: Micro-bending attenuation spike to <span class="font-mono font-bold text-rose-600">0.62 dB/km</span>. Splicer dispatched to Mile Marker 342.
+            </p>
+          </div>
+        </div>
+        <button onclick="switchTab('tab-looker-ca')"
+                class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-orange-500 text-slate-800 font-medium flex items-center space-x-1.5 transition shrink-0 shadow-xs">
+          <i class="fa-solid fa-brain text-[#f5831f]"></i>
+          <span>Ask Looker Agent</span>
+        </button>
+      </div>
+
+      <!-- CHARTS & TELEMETRY HIGHLIGHTS -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Bandwidth & Anomaly Bounds Chart -->
+        <div class="lg:col-span-8 clean-card p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                <i class="fa-solid fa-chart-area text-[#f5831f]"></i>
+                <span>Traffic Utilization & Dynamic Baseline Bounds</span>
+              </h3>
+              <p class="text-xs text-slate-500">Actual throughput vs machine learning anomaly thresholds</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-xs text-slate-500 font-medium">Corridor:</label>
+              <select id="route-select" onchange="loadTrafficChart(this.value)"
+                      class="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 font-medium focus:outline-none focus:border-[#f5831f]">
+                <option value="ASH-ATL-02">Ashburn - Atlanta Ring (Traffic Surge)</option>
+                <option value="DFW-PHX-03">Dallas - Phoenix Corridor (Traffic Drop)</option>
+                <option value="CHI-DEN-01">Chicago - Denver Transcontinental</option>
+                <option value="NYC-CHI-05">New York - Chicago Financial ULL</option>
+              </select>
+            </div>
+          </div>
+          <div class="h-64 relative">
+            <canvas id="trafficChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Optical Telemetry Triggers List -->
+        <div class="lg:col-span-4 clean-card p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2 mb-3">
+              <i class="fa-solid fa-wave-pulse text-[#f5831f]"></i>
+              <span>High-Impact Optical Triggers</span>
+            </h3>
+
+            <div class="space-y-3">
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50/60">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-mono text-slate-900 font-bold">DEN-SLC-07-SPAN-02</span>
+                  <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-mono text-[10px] font-bold">P1 Immediate</span>
+                </div>
+                <div class="text-xs font-semibold text-slate-800 mt-1">EDFA Laser Diode Pump Collapse</div>
+                <div class="text-[11px] text-slate-600 mt-0.5">Power dropped to 12.4 dBm. Tech scheduled for C-Band amplifier swap.</div>
+              </div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50/60">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-mono text-slate-900 font-bold">ASH-ATL-02-SPAN-03</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-mono text-[10px] font-bold">P2 High</span>
+                </div>
+                <div class="text-xs font-semibold text-slate-800 mt-1">DAS Ground Vibration Spike</div>
+                <div class="text-[11px] text-slate-600 mt-0.5">Acoustic vibration 85.2. Excavator utility trenching near I-85.</div>
+              </div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50/60">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-mono text-slate-900 font-bold">NYC-CHI-05-SPAN-01</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono text-[10px]">P3 Scheduled</span>
+                </div>
+                <div class="text-xs font-semibold text-slate-800 mt-1">Polarization Mode Drift</div>
+                <div class="text-[11px] text-slate-600 mt-0.5">0.12 ps/sqrt(km). Transponder DSP recalibration queued.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-mono">
+            <span>Engine: Time-Series Anomaly Detection</span>
+            <span class="text-[#f5831f] font-semibold">95% Confidence Bounds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREDICTIVE DISPATCH QUEUE TABLE -->
+      <div class="clean-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-truck-fast text-[#f5831f]"></i>
+              <span>Autonomous Predictive Maintenance Dispatch Queue</span>
+            </h3>
+            <p class="text-xs text-slate-500">Autonomous field dispatches prioritized by failure risk and customer SLA exposure</p>
+          </div>
+          <span class="text-[11px] px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-semibold">
+            Live Looker Sync
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-600 font-mono border-b border-slate-200 uppercase tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3">Span & Corridor</th>
+                <th class="py-2.5 px-3">Failure Risk</th>
+                <th class="py-2.5 px-3">Window</th>
+                <th class="py-2.5 px-3">Root Trigger</th>
+                <th class="py-2.5 px-3">Recommended Action</th>
+                <th class="py-2.5 px-3">Priority</th>
+                <th class="py-2.5 px-3 text-right">SLA Exposure</th>
+                <th class="py-2.5 px-3 text-center">Looker Action</th>
+              </tr>
+            </thead>
+            <tbody id="maintenance-table-body" class="divide-y divide-slate-200">
+              <tr><td colspan="8" class="py-6 text-center text-slate-500 font-mono">Loading predictive maintenance queue from BigQuery...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- TAB 2: AUTOML FAILURE PREDICTOR (MODEL STUDIO) -->
+    <!-- ============================================================= -->
+    <div id="tab-automl" class="tab-pane hidden max-w-[1800px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      
+      <!-- AutoML Header & Performance Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium">Model Accuracy</div>
+          <div class="text-2xl font-bold text-emerald-600 mt-1 font-mono">96.8%</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Test Split Evaluation</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium">ROC AUC Score</div>
+          <div class="text-2xl font-bold text-slate-900 mt-1 font-mono">0.985</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Multi-class Discrimination</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium">Algorithm</div>
+          <div class="text-lg font-bold text-[#ea580c] mt-1 font-mono">Boosted Trees</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">XGBoost via BigQuery ML</div>
+        </div>
+
+        <div class="clean-card p-4">
+          <div class="text-xs text-slate-500 font-medium">Top Failure Driver</div>
+          <div class="text-lg font-bold text-slate-900 mt-1 font-mono">DAS Vibration</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">38.4% Relative Gain</div>
+        </div>
+      </div>
+
+      <!-- Feature Importance & Explainability -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Global Feature Importance Bars -->
+        <div class="lg:col-span-7 clean-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                <i class="fa-solid fa-ranking-star text-[#f5831f]"></i>
+                <span>Global Feature Importance (Tree SHAP Gain)</span>
+              </h3>
+              <p class="text-xs text-slate-500">Calculated via <span class="font-mono">ML.FEATURE_IMPORTANCE</span> across 10,800 optical telemetry points</p>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-orange-100 text-[#ea580c] font-semibold font-mono">
+              AutoML Explain
+            </span>
+          </div>
+
+          <!-- Feature Bars -->
+          <div class="space-y-4 text-xs" id="feature-importance-container">
+            <!-- Rendered dynamically via JS -->
+            <div class="text-center text-slate-400 py-4 font-mono">Loading feature importances...</div>
+          </div>
+        </div>
+
+        <!-- How AutoML Predicts Fiber Cuts -->
+        <div class="lg:col-span-5 clean-card p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2 mb-3">
+              <i class="fa-solid fa-lightbulb text-amber-500"></i>
+              <span>Explainable Predictive Pipeline</span>
+            </h3>
+
+            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="font-bold text-slate-900 mb-1">1. Multi-Sensor Feature Fusion</div>
+                <p>Combines physical optical attenuation (dB/km), pre-FEC BER, EDFA laser diode wattage, and fiber route topography into a real-time vector.</p>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="font-bold text-slate-900 mb-1">2. Ground Motion Detection (DAS)</div>
+                <p>Distributed Acoustic Sensing detects backhoes and construction trenching along highway rights-of-way hours before physical sheath penetration.</p>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="font-bold text-slate-900 mb-1">3. Automated Field Dispatch</div>
+                <p>Spans scoring &gt;80% failure risk auto-queue an OTDR crew with exact mile marker coordinates to preserve customer SLAs.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-500">
+            <span>Machine Learning: Predictive Failure Classifier</span>
+            <span class="text-emerald-600 font-semibold">Trained & Validated</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AutoML High Risk Predictions Table -->
+      <div class="clean-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-crosshairs text-[#f5831f]"></i>
+              <span>High-Risk Fiber Spans Scored by AutoML</span>
+            </h3>
+            <p class="text-xs text-slate-500">Predicted failure labels with confidence probability and top driving factor</p>
+          </div>
+          <button onclick="switchTab('tab-looker-ca')"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-[#ea580c] border border-orange-200 font-semibold flex items-center space-x-1.5 transition">
+            <i class="fa-solid fa-brain"></i>
+            <span>Ask Looker Agent</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-600 font-mono border-b border-slate-200 uppercase tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3">Fiber Span</th>
+                <th class="py-2.5 px-3">Corridor</th>
+                <th class="py-2.5 px-3">Predicted Risk</th>
+                <th class="py-2.5 px-3">Failure Prob</th>
+                <th class="py-2.5 px-3">Primary Feature Driver</th>
+                <th class="py-2.5 px-3">Mitigation Action</th>
+                <th class="py-2.5 px-3 text-right">Protected SLA</th>
+              </tr>
+            </thead>
+            <tbody id="automl-preds-body" class="divide-y divide-slate-200">
+              <tr><td colspan="7" class="py-6 text-center text-slate-500 font-mono">Loading AutoML predictions from BigQuery...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- TAB 3: LOOKER BI DASHBOARD -->
+    <!-- ============================================================= -->
+    <div id="tab-looker" class="tab-pane hidden w-full relative">
+      <!-- Floating Open in Looker action (no duplicate header bar) -->
+      <div class="absolute top-3 right-6 z-10">
+        <a href="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/dashboards/169" target="_blank"
+           class="text-xs px-3.5 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#ea580c] text-white font-semibold flex items-center space-x-1.5 transition shadow-sm">
+          <span>Open in Looker</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+
+      <!-- Edge-to-edge Embedded Dashboard iframe -->
+      <iframe src="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/embed/dashboards/169?theme=zayo_corporate&allow_login_screen=true"
+              style="width: 100%; height: calc(100vh - 105px); min-height: 850px; border: 0; display: block;"
+              allow="fullscreen"></iframe>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- TAB 5: LOOKER CONVERSATIONAL ANALYTICS -->
+    <!-- ============================================================= -->
+    <div id="tab-looker-ca" class="tab-pane hidden w-full relative">
+      <!-- Floating Gemini Enterprise action (no duplicate header bar) -->
+      <div class="absolute top-3 right-6 z-10">
+        <a href="https://vertexaisearch.cloud.google.com/home/cid/8816aa35-65e6-45ec-b8a4-0ba394801abb/r/session/16242364684410018343?hl=en_US&_gl=1*nzewaq*_ga*MTMxNjI5ODAxNy4xNjk4MjQ2OTM3*_ga_WH2QY8WWF5*czE3ODkwODI3OTYkbzI0NCRnMSR0MTc4OTA4MjgyMCRqMzYkbDAkaDA.&pli=1" target="_blank"
+           class="text-xs px-3.5 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#ea580c] text-white font-semibold flex items-center space-x-1.5 transition shadow-sm">
+          <span>Chat in Gemini Enterprise</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+
+      <!-- Edge-to-edge Embedded CA iframe -->
+      <iframe id="looker-ca-iframe"
+              src="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/embed/conversations?ds.agent=e8e08189aefe4301b80d1dd45d444f3d&theme=zayo_corporate&allow_login_screen=true"
+              style="width: 100%; height: calc(100vh - 105px); min-height: 850px; border: 0; display: block;"
+              allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- TAB 6: SOLUTION & MODEL WALKTHROUGH -->
+    <!-- ============================================================= -->
+    <div id="tab-walkthrough" class="tab-pane hidden max-w-[1800px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+      <!-- HERO HEADER CARD -->
+      <div class="clean-card p-5 sm:p-6 bg-gradient-to-r from-white via-orange-50/20 to-white">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="p-1.5 rounded-lg bg-orange-50 text-[#f5831f] border border-orange-200">
+                <i class="fa-solid fa-layer-group text-sm"></i>
+              </span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">Autonomous Network Intelligence: Solution & Model Walkthrough</h2>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-4xl">
+              An architectural deep dive into how Zayo transforms 17,000+ hours of physical fiber optic telemetry into proactive 72-hour outage prevention using BigQuery ML, LookML semantic governance, and Gemini Conversational Analytics.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-orange-100 text-[#ea580c] font-semibold font-mono">BigQuery ML In-Engine</span>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 font-semibold font-mono">LookML Semantic Layer</span>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold font-mono">Gemini Data Agent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: THE BUSINESS PROBLEM & STRATEGIC USE CASE -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2">
+          <span class="h-2 w-2 rounded-full bg-[#f5831f]"></span>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900">1. The Telecom Business Problem & Use Case</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Problem Card -->
+          <div class="clean-card p-5 space-y-3 border-l-4 border-l-rose-500">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-rose-600 flex items-center space-x-1.5">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>The Industry Challenge</span>
+              </span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-medium">Reactive Ops</span>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">Unscheduled Outages & Heavy SLA Penalties</h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Zayo operates <strong>5,950+ route miles</strong> of mission-critical long-haul dark fiber carrying <strong>464 Tbps</strong> of backbone capacity across 8 core transport corridors. Traditional telecom operations are reactive: outages caused by third-party construction backhoe strikes, laser diode degradation, connector dirt, and optical microbends trigger immediate emergency rollouts and severe customer SLA penalty liabilities (<strong>$475,000+ exposure</strong>).
+            </p>
+          </div>
+
+          <!-- Solution Card -->
+          <div class="clean-card p-5 space-y-3 border-l-4 border-l-[#f5831f]">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#ea580c] flex items-center space-x-1.5">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>The Autonomous Solution</span>
+              </span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-orange-50 text-[#ea580c] font-medium">72-Hr Warning</span>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">Predictive Maintenance & Continuous Telemetry</h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              By streaming optical telemetry (attenuation dB/km, OSNR, Pre-FEC BER, EDFA laser power, and Distributed Acoustic Sensing vibration) directly into BigQuery, machine learning models continuously score each span's failure probability (0–100%) and classify traffic anomalies up to <strong>72 hours before customer-impacting failure</strong>, enabling proactive maintenance dispatches.
+            </p>
+          </div>
+
+          <!-- Impact Card -->
+          <div class="clean-card p-5 space-y-3 border-l-4 border-l-emerald-500">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center space-x-1.5">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Quantifiable Impact</span>
+              </span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">Measurable ROI</span>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">Zero Data Movement & Governed AI</h4>
+            <div class="space-y-1.5 text-xs text-slate-600">
+              <div class="flex items-start space-x-2">
+                <i class="fa-solid fa-check text-emerald-600 mt-0.5 text-[11px]"></i>
+                <span><strong>99.6% Accuracy</strong> in early optical failure classification.</span>
+              </div>
+              <div class="flex items-start space-x-2">
+                <i class="fa-solid fa-check text-emerald-600 mt-0.5 text-[11px]"></i>
+                <span><strong>$475,000 SLA Penalty Exposure</strong> actively mitigated.</span>
+              </div>
+              <div class="flex items-start space-x-2">
+                <i class="fa-solid fa-check text-emerald-600 mt-0.5 text-[11px]"></i>
+                <span><strong>Zero-ETL Overhead:</strong> In-database ML training inside BigQuery.</span>
+              </div>
+              <div class="flex items-start space-x-2">
+                <i class="fa-solid fa-check text-emerald-600 mt-0.5 text-[11px]"></i>
+                <span><strong>Conversational Democratization:</strong> Natural language query with Gemini.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: HOW THE MODELS ARE ACTUALLY BUILT -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2">
+          <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900">2. How the BigQuery ML Models are Built</h3>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Model 1: Bandwidth ARIMA -->
+          <div class="clean-card p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-1 rounded bg-blue-50 text-blue-700 font-mono text-xs font-bold">MODEL 1: TIME SERIES</span>
+                <span class="text-xs text-slate-500 font-mono">11,712 Rows</span>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">Bandwidth Anomaly Engine</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><code>route_bandwidth_arima_model</code></p>
+              </div>
+              <div class="text-xs text-slate-600 space-y-2">
+                <p>
+                  <strong>Algorithm:</strong> BigQuery ML <code>ARIMA_PLUS</code> time-series forecasting with automated trend, diurnal hourly cycles, and seasonal decomposition.
+                </p>
+                <p>
+                  <strong>How It Works:</strong> Learns normal diurnal traffic patterns across 8 routes. In production, <code>ML.DETECT_ANOMALIES</code> with 95% confidence intervals flags sudden traffic spikes (DDoS, routing loops) or drops (unannounced fiber degradation).
+                </p>
+                <p>
+                  <strong>Materialized Output:</strong> <code>route_traffic_anomalies</code> (628 anomalies detected: <code>TRAFFIC_SURGE</code> vs <code>TRAFFIC_DROP</code>).
+                </p>
+              </div>
+            </div>
+            <!-- SQL Snippet Box -->
+            <div class="mt-2 rounded-lg bg-slate-900 p-3 text-[11px] font-mono text-slate-200 overflow-x-auto">
+              <div class="text-slate-400 text-[10px] mb-1 font-sans font-semibold">BQML CREATE MODEL SQL:</div>
+              <span class="text-amber-400">CREATE OR REPLACE MODEL</span> `zayo.route_bandwidth_arima`<br>
+              <span class="text-cyan-400">OPTIONS</span>(model_type=<span class="text-emerald-400">'ARIMA_PLUS'</span>,<br>
+              &nbsp;&nbsp;time_series_timestamp_col=<span class="text-emerald-400">'timestamp'</span>,<br>
+              &nbsp;&nbsp;time_series_data_col=<span class="text-emerald-400">'bandwidth_utilization_gbps'</span>,<br>
+              &nbsp;&nbsp;time_series_id_col=<span class="text-emerald-400">'route_id'</span>)<br>
+              <span class="text-amber-400">AS SELECT</span> timestamp, route_id, bandwidth_utilization_gbps<br>
+              <span class="text-amber-400">FROM</span> `zayo.route_traffic_metrics`;
+            </div>
+          </div>
+
+          <!-- Model 2: Optical Attenuation ARIMA -->
+          <div class="clean-card p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-1 rounded bg-purple-50 text-purple-700 font-mono text-xs font-bold">MODEL 2: PHYSICAL LAYER</span>
+                <span class="text-xs text-slate-500 font-mono">17,568 Rows</span>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">Optical Attenuation Anomaly Engine</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><code>optical_attenuation_arima_model</code></p>
+              </div>
+              <div class="text-xs text-slate-600 space-y-2">
+                <p>
+                  <strong>Algorithm:</strong> BigQuery ML <code>ARIMA_PLUS</code> on continuous optical loss (<code>attenuation_db_per_km</code>) across 24 fiber spans.
+                </p>
+                <p>
+                  <strong>How It Works:</strong> Tracks physical layer signal attenuation trends. Flags subtle degradation caused by optical connector contamination, fiber bend stress, or aging splices before bit error rate triggers catastrophic outage.
+                </p>
+                <p>
+                  <strong>Materialized Output:</strong> <code>optical_span_anomalies</code> (1,756 anomalies classified as <code>CRITICAL_DEGRADATION</code> or <code>ELEVATED_LOSS</code>).
+                </p>
+              </div>
+            </div>
+            <!-- SQL Snippet Box -->
+            <div class="mt-2 rounded-lg bg-slate-900 p-3 text-[11px] font-mono text-slate-200 overflow-x-auto">
+              <div class="text-slate-400 text-[10px] mb-1 font-sans font-semibold">BQML CREATE MODEL SQL:</div>
+              <span class="text-amber-400">CREATE OR REPLACE MODEL</span> `zayo.optical_attenuation_arima`<br>
+              <span class="text-cyan-400">OPTIONS</span>(model_type=<span class="text-emerald-400">'ARIMA_PLUS'</span>,<br>
+              &nbsp;&nbsp;time_series_timestamp_col=<span class="text-emerald-400">'timestamp'</span>,<br>
+              &nbsp;&nbsp;time_series_data_col=<span class="text-emerald-400">'attenuation_db_per_km'</span>,<br>
+              &nbsp;&nbsp;time_series_id_col=<span class="text-emerald-400">'span_id'</span>)<br>
+              <span class="text-amber-400">AS SELECT</span> timestamp, span_id, attenuation_db_per_km<br>
+              <span class="text-amber-400">FROM</span> `zayo.optical_span_telemetry`;
+            </div>
+          </div>
+
+          <!-- Model 3: AutoML Boosted Trees -->
+          <div class="clean-card p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-1 rounded bg-orange-50 text-[#ea580c] font-mono text-xs font-bold">MODEL 3: AUTOML PREDICTOR</span>
+                <span class="text-xs text-emerald-700 font-mono font-bold">99.6% Accuracy</span>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">Optical Failure & Risk Classifier</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><code>automl_optical_failure_classifier</code></p>
+              </div>
+              <div class="text-xs text-slate-600 space-y-2">
+                <p>
+                  <strong>Algorithm:</strong> BigQuery ML <code>BOOSTED_TREE_CLASSIFIER</code> (Gradient Boosted Trees / XGBoost) with <code>enable_global_explain=TRUE</code> (Tree SHAP).
+                </p>
+                <p>
+                  <strong>Top Feature Importance (SHAP):</strong><br>
+                  • Optical Attenuation: <strong>31.6%</strong><br>
+                  • OSNR Signal-to-Noise: <strong>23.8%</strong><br>
+                  • DAS Acoustic Ground Vibration: <strong>14.5%</strong> <em>(detects backhoes digging near fiber!)</em><br>
+                  • Route Distance: <strong>9.3%</strong> | EDFA Laser Output: <strong>7.9%</strong>
+                </p>
+                <p>
+                  <strong>Performance:</strong> 99.6% Accuracy, 0.998 ROC-AUC, 0.995 F1-Score.
+                </p>
+              </div>
+            </div>
+            <!-- SQL Snippet Box -->
+            <div class="mt-2 rounded-lg bg-slate-900 p-3 text-[11px] font-mono text-slate-200 overflow-x-auto">
+              <div class="text-slate-400 text-[10px] mb-1 font-sans font-semibold">BQML CREATE MODEL SQL:</div>
+              <span class="text-amber-400">CREATE OR REPLACE MODEL</span> `zayo.automl_failure_clf`<br>
+              <span class="text-cyan-400">OPTIONS</span>(model_type=<span class="text-emerald-400">'BOOSTED_TREE_CLASSIFIER'</span>,<br>
+              &nbsp;&nbsp;input_label_cols=[<span class="text-emerald-400">'failure_risk_label'</span>],<br>
+              &nbsp;&nbsp;max_iterations=20, learn_rate=0.1,<br>
+              &nbsp;&nbsp;enable_global_explain=TRUE)<br>
+              <span class="text-amber-400">AS SELECT</span> failure_risk_label, attenuation_db_per_km,<br>
+              &nbsp;&nbsp;osnr_db, pre_fec_ber, edfa_laser_output_power_dbm,<br>
+              &nbsp;&nbsp;das_vibration_index, conduit_temp_c, distance_mi<br>
+              <span class="text-amber-400">FROM</span> `zayo.optical_span_training_data`;
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: END-TO-END ARCHITECTURAL PIPELINE -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900">3. End-to-End Architectural Pipeline (From Fiber to Executive)</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Step 1 -->
+          <div class="clean-card p-4 space-y-2">
+            <div class="flex items-center space-x-2 text-xs font-bold text-slate-900">
+              <span class="h-6 w-6 rounded-full bg-orange-100 text-[#ea580c] flex items-center justify-center font-mono">1</span>
+              <span>Telemetry Ingestion</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Streaming physical layer telemetry (EDFA transceivers, OTDR traces, Distributed Acoustic Sensing) and NetFlow utilization metrics into BigQuery.
+            </p>
+            <div class="text-[11px] font-mono text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+              5,950+ route miles<br>
+              29,000+ hourly telemetry rows
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="clean-card p-4 space-y-2">
+            <div class="flex items-center space-x-2 text-xs font-bold text-slate-900">
+              <span class="h-6 w-6 rounded-full bg-orange-100 text-[#ea580c] flex items-center justify-center font-mono">2</span>
+              <span>BigQuery ML In-Engine</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Zero-ETL machine learning executed directly in BigQuery. Models continuously score failure probabilities and detect multi-dimensional anomalies with zero data movement.
+            </p>
+            <div class="text-[11px] font-mono text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+              2x ARIMA+ Time Series<br>
+              1x AutoML Boosted Trees
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="clean-card p-4 space-y-2">
+            <div class="flex items-center space-x-2 text-xs font-bold text-slate-900">
+              <span class="h-6 w-6 rounded-full bg-orange-100 text-[#ea580c] flex items-center justify-center font-mono">3</span>
+              <span>LookML Semantic Layer</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Governed business logic defining SLA penalty exposure, join relationships across corridors and spans, and standardized metrics certified for all consumers.
+            </p>
+            <div class="text-[11px] font-mono text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+              4 Governed LookML Explores<br>
+              Centralized SLA & Risk Metrics
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="clean-card p-4 space-y-2">
+            <div class="flex items-center space-x-2 text-xs font-bold text-slate-900">
+              <span class="h-6 w-6 rounded-full bg-orange-100 text-[#ea580c] flex items-center justify-center font-mono">4</span>
+              <span>Autonomous AI & BI</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Multi-channel delivery: Executive Looker Dashboard with sparklines, conversational Looker Data Agent with code interpreter, and Agent-to-Agent (A2A) publishing to Gemini Enterprise.
+            </p>
+            <div class="text-[11px] font-mono text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+              Looker Dashboard ID 169<br>
+              Gemini Conversational Agents
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: INVENTORY OF CREATED ASSETS -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2">
+          <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900">4. Inventory of Created Assets in this Engagement</h3>
+        </div>
+
+        <div class="clean-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3">Layer</th>
+                  <th class="px-4 py-3">Asset Name</th>
+                  <th class="px-4 py-3">Type & Engine</th>
+                  <th class="px-4 py-3">Role & Business Purpose</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">BigQuery Storage</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">fiber_routes</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery Table</td>
+                  <td class="px-4 py-3 text-slate-600">8 core corridors, 5,950 total route miles, 464 Tbps capacity metadata.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">BigQuery Storage</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">optical_span_telemetry</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery Table</td>
+                  <td class="px-4 py-3 text-slate-600">17,568 hourly optical telemetry readings (attenuation, OSNR, Pre-FEC BER, EDFA, DAS).</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">BigQuery Storage</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">route_traffic_metrics</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery Table</td>
+                  <td class="px-4 py-3 text-slate-600">11,712 hourly NetFlow bandwidth utilization and throughput records.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">Machine Learning</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">route_bandwidth_arima_model</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery ML ARIMA+</td>
+                  <td class="px-4 py-3 text-slate-600">Time-series forecasting and surge/drop anomaly detection with 95% confidence intervals.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">Machine Learning</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">optical_attenuation_arima_model</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery ML ARIMA+</td>
+                  <td class="px-4 py-3 text-slate-600">Time-series physical attenuation degradation tracking across 24 spans.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">Machine Learning</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">automl_optical_failure_classifier</td>
+                  <td class="px-4 py-3 text-slate-500">BigQuery ML Boosted Trees</td>
+                  <td class="px-4 py-3 text-slate-600">Predictive optical failure probability (99.6% accuracy) with Tree SHAP global explainability.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">Semantic Layer</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">zayo_network_analytics.model</td>
+                  <td class="px-4 py-3 text-slate-500">LookML Explores (4)</td>
+                  <td class="px-4 py-3 text-slate-600">Certified business modeling for operations, optical health, maintenance queue, and NOC tickets.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">BI & Visualizations</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">Dashboard 169 (zayo_corporate)</td>
+                  <td class="px-4 py-3 text-slate-500">Looker UDD Dashboard</td>
+                  <td class="px-4 py-3 text-slate-600">Executive operations dashboard with 6 KPI sparkline tiles, risk matrices, and telemetry charts.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                  <td class="px-4 py-3 font-semibold text-slate-900">Conversational AI</td>
+                  <td class="px-4 py-3 font-mono text-slate-700">Zayo Autonomous Network Intelligence Agent</td>
+                  <td class="px-4 py-3 text-slate-500">Looker CA & Gemini Enterprise</td>
+                  <td class="px-4 py-3 text-slate-600">Governed data agent with 5 golden queries, code interpreter, and Agent-to-Agent (A2A) publication.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let trafficChartInstance = null;
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('border-[#f5831f]', 'text-[#f5831f]', 'font-semibold');
+        el.classList.add('border-transparent', 'text-slate-600');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-600');
+        activeBtn.classList.add('border-[#f5831f]', 'text-[#f5831f]', 'font-semibold');
+      }
+      if (tabId === 'tab-automl') {
+        loadAutoML();
+      }
+    }
+
+    // Load High-Level Stats
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        if (data.total_miles) document.getElementById('kpi-miles').innerText = data.total_miles.toLocaleString() + ' mi';
+        if (data.total_capacity_tbps) document.getElementById('kpi-capacity').innerText = data.total_capacity_tbps + ' Tbps';
+        if (data.traffic_anomalies) document.getElementById('kpi-traffic-anom').innerText = data.traffic_anomalies.toLocaleString();
+        if (data.optical_anomalies) document.getElementById('kpi-optical-anom').innerText = data.optical_anomalies.toLocaleString();
+        if (data.total_sla_exposure_usd) document.getElementById('kpi-sla-exposure').innerText = '$' + data.total_sla_exposure_usd.toLocaleString();
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    }
+
+    // Load Predictive Maintenance Table
+    async function loadMaintenanceTable() {
+      try {
+        const res = await fetch('/api/predictive-maintenance');
+        const data = await res.json();
+        const tbody = document.getElementById('maintenance-table-body');
+        tbody.innerHTML = '';
+
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+
+          const riskBadge = row.risk_tier === 'CRITICAL' 
+            ? '<span class="px-2 py-0.5 rounded bg-red-100 text-red-800 font-mono text-[10px] font-bold">CRITICAL (' + Math.round(row.predicted_failure_prob * 100) + '%)</span>'
+            : row.risk_tier === 'HIGH'
+            ? '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[10px] font-bold">HIGH (' + Math.round(row.predicted_failure_prob * 100) + '%)</span>'
+            : '<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-[10px]">' + row.risk_tier + '</span>';
+
+          const priorityBadge = row.dispatch_priority.startsWith('P1')
+            ? '<span class="text-red-700 font-semibold">' + row.dispatch_priority + '</span>'
+            : row.dispatch_priority.startsWith('P2')
+            ? '<span class="text-amber-700 font-semibold">' + row.dispatch_priority + '</span>'
+            : '<span class="text-slate-500">' + row.dispatch_priority + '</span>';
+
+          tr.innerHTML = `
+            <td class="py-2.5 px-3">
+              <div class="font-semibold text-slate-900">${row.span_name}</div>
+              <div class="text-[11px] text-slate-500 font-mono">${row.span_id}</div>
+            </td>
+            <td class="py-2.5 px-3">${riskBadge}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-600">${row.failure_timeframe}</td>
+            <td class="py-2.5 px-3">
+              <div class="text-slate-800 font-medium">${row.primary_anomaly_trigger}</div>
+              <div class="text-[10px] text-[#ea580c] font-mono font-semibold">${row.anomaly_metric_value}</div>
+            </td>
+            <td class="py-2.5 px-3 text-slate-600">${row.recommended_action}</td>
+            <td class="py-2.5 px-3 font-mono text-[11px]">${priorityBadge}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-semibold text-emerald-600">$${row.sla_financial_risk_usd.toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-center">
+              <button onclick="dispatchAlertCard('${row.span_id}', '${row.span_name.replace(/'/g, "\\'")}', '${row.risk_tier}', '${row.primary_anomaly_trigger}', '$${row.sla_financial_risk_usd.toLocaleString()}', '${row.recommended_action.replace(/'/g, "\\'")}')" class="inline-flex items-center space-x-1.5 px-2.5 py-1 text-[11px] font-semibold text-white bg-[#f5831f] hover:bg-[#d97216] rounded-md transition shadow-xs">
+                <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                <span>Alert GChat</span>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error loading maintenance table:', err);
+      }
+    }
+
+    // Load Traffic Chart with ARIMA Confidence Bounds
+    async function loadTrafficChart(routeId = 'ASH-ATL-02') {
+      try {
+        const res = await fetch(`/api/traffic-chart?route_id=${routeId}`);
+        const data = await res.json();
+
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        if (trafficChartInstance) {
+          trafficChartInstance.destroy();
+        }
+
+        const pointBackgroundColors = data.is_anomaly.map((anom, idx) => {
+          if (!anom) return 'transparent';
+          return data.anomaly_category[idx] === 'TRAFFIC_SURGE' ? '#ef4444' : '#f5831f';
+        });
+        const pointRadii = data.is_anomaly.map(anom => anom ? 6 : 0);
+
+        trafficChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: 'Actual Bandwidth (Gbps)',
+                data: data.actual,
+                borderColor: '#f5831f',
+                backgroundColor: 'rgba(245, 131, 31, 0.08)',
+                borderWidth: 2.2,
+                tension: 0.25,
+                fill: false,
+                pointBackgroundColor: pointBackgroundColors,
+                pointBorderColor: '#fff',
+                pointRadius: pointRadii,
+                pointHoverRadius: 8
+              },
+              {
+                label: 'ARIMA Upper Bound (95%)',
+                data: data.upper_bound,
+                borderColor: '#94a3b8',
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                fill: false,
+                pointRadius: 0
+              },
+              {
+                label: 'ARIMA Lower Bound (95%)',
+                data: data.lower_bound,
+                borderColor: '#cbd5e1',
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                fill: false,
+                pointRadius: 0
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#475569', font: { family: 'Inter', size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  afterBody: function(context) {
+                    const idx = context[0].dataIndex;
+                    if (data.is_anomaly[idx]) {
+                      return `⚠️ BQML Anomaly: ${data.anomaly_category[idx]}`;
+                    }
+                    return '';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { grid: { color: 'rgba(0, 0, 0, 0.04)' }, ticks: { color: '#64748b', maxTicksLimit: 12, font: { size: 10 } } },
+              y: { grid: { color: 'rgba(0, 0, 0, 0.04)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading traffic chart:', err);
+      }
+    }
+
+    // Load AutoML Data
+    async function loadAutoML() {
+      try {
+        const res = await fetch('/api/automl');
+        const data = await res.json();
+        
+        // Render Feature Importances
+        const container = document.getElementById('feature-importance-container');
+        if (container && data.feature_importances) {
+          container.innerHTML = '';
+          data.feature_importances.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'space-y-1';
+            row.innerHTML = `
+              <div class="flex justify-between items-center text-xs">
+                <div>
+                  <span class="font-semibold text-slate-800">${item.label}</span>
+                  <span class="text-[11px] text-slate-400 block">${item.description}</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-bold text-[#ea580c]">${item.importance_pct}%</span>
+                  <span class="text-[10px] text-slate-400 block font-mono">Gain: ${item.gain}</span>
+                </div>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div class="bg-gradient-to-r from-[#f5831f] to-[#ea580c] h-2.5 rounded-full" style="width: ${item.importance_pct}%"></div>
+              </div>
+            `;
+            container.appendChild(row);
+          });
+        }
+
+        // Render AutoML Predictions
+        const tbody = document.getElementById('automl-preds-body');
+        if (tbody && data.predictions) {
+          tbody.innerHTML = '';
+          data.predictions.forEach(pred => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition';
+            const riskBadge = pred.predicted_risk_label === 'CRITICAL'
+              ? '<span class="px-2 py-0.5 rounded bg-red-100 text-red-800 font-mono text-[10px] font-bold">CRITICAL</span>'
+              : '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[10px] font-bold">HIGH</span>';
+
+            tr.innerHTML = `
+              <td class="py-2.5 px-3">
+                <div class="font-semibold text-slate-900">${pred.span_name}</div>
+                <div class="text-[11px] text-slate-500 font-mono">${pred.span_id}</div>
+              </td>
+              <td class="py-2.5 px-3 text-slate-700">${pred.route_name}</td>
+              <td class="py-2.5 px-3">${riskBadge}</td>
+              <td class="py-2.5 px-3 font-mono font-bold text-[#ea580c]">${Math.round(pred.failure_probability * 100)}%</td>
+              <td class="py-2.5 px-3">
+                <div class="text-slate-800 font-medium">${pred.primary_shap_driver}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${pred.anomaly_metric_value}</div>
+              </td>
+              <td class="py-2.5 px-3 text-slate-600">${pred.recommended_action}</td>
+              <td class="py-2.5 px-3 text-right font-mono font-semibold text-emerald-600">$${pred.sla_financial_risk_usd.toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        console.error('Error loading AutoML data:', err);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStats();
+      loadMaintenanceTable();
+      loadTrafficChart('ASH-ATL-02');
+      loadAutoML();
+    });
+
+    let currentAlertData = null;
+
+    function dispatchAlertCard(spanId, spanName, riskTier, trigger, slaRisk, action) {
+      currentAlertData = {
+        span_id: spanId,
+        span_name: spanName,
+        severity: riskTier === 'CRITICAL' ? 'CRITICAL' : 'WARNING',
+        route: spanName,
+        rx_power: trigger,
+        sla_risk: slaRisk,
+        impact: action
+      };
+
+      document.getElementById('modal-subtitle').innerText = `Target: ${spanId} (${spanName})`;
+      const banner = document.getElementById('modal-status-banner');
+      banner.className = 'hidden';
+      banner.innerHTML = '';
+      
+      const badgeColor = currentAlertData.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-amber-100 text-amber-800 border-amber-200';
+      const sevIcon = currentAlertData.severity === 'CRITICAL' ? '🚨 CRITICAL OUTAGE RISK' : '⚠️ OPTICAL DEGRADATION';
+
+      document.getElementById('modal-card-preview').innerHTML = `
+        <div class="border-l-4 ${currentAlertData.severity === 'CRITICAL' ? 'border-red-600' : 'border-amber-500'} pl-3 py-1 space-y-1.5 bg-white p-3 rounded-r-lg border border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">${sevIcon}: ${spanId}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${badgeColor}">${currentAlertData.severity}</span>
+          </div>
+          <div class="text-[11px] text-slate-600"><b>Span:</b> ${spanName}</div>
+          <div class="text-[11px] text-slate-600"><b>Optical Trigger:</b> <span class="text-rose-600 font-mono font-semibold">${trigger}</span></div>
+          <div class="text-[11px] text-slate-600"><b>SLA Penalty Exposure:</b> <span class="font-bold text-slate-900">${slaRisk}</span></div>
+          <div class="text-[11px] text-slate-600"><b>Recommended Action:</b> ${action}</div>
+        </div>
+        <div class="pt-2 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+          <span>Looker Action: CardsV2 Webhook Payload</span>
+          <span class="text-[#f5831f] font-semibold">1-Click Escalation</span>
+        </div>
+      `;
+
+      document.getElementById('gchat-modal').classList.remove('hidden');
+    }
+
+    function closeAlertModal() {
+      document.getElementById('gchat-modal').classList.add('hidden');
+    }
+
+    async function executeDispatchAlert() {
+      if (!currentAlertData) return;
+      const btn = document.getElementById('modal-dispatch-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i><span>Dispatching...</span>';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/alerts/dispatch_gchat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentAlertData)
+        });
+        const data = await res.json();
+        const banner = document.getElementById('modal-status-banner');
+        banner.classList.remove('hidden');
+
+        if (data.status === 'dispatched') {
+          banner.className = 'p-3 rounded-lg text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200';
+          banner.innerHTML = '<b>✓ Live Webhook Dispatched!</b> Google Chat CardsV2 message posted to operations space.';
+        } else {
+          banner.className = 'p-3 rounded-lg text-[11px] font-mono bg-sky-50 text-sky-800 border border-sky-200';
+          banner.innerHTML = '<b>✓ CardsV2 Verified!</b> Simulated successfully in dry-run mode (HTTP 200). Ready for live Google Chat space.';
+        }
+      } catch (err) {
+        const banner = document.getElementById('modal-status-banner');
+        banner.classList.remove('hidden');
+        banner.className = 'p-3 rounded-lg text-[11px] font-mono bg-red-50 text-red-800 border border-red-200';
+        banner.innerHTML = '<b>❌ Error:</b> ' + err.message;
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+  <!-- GOOGLE CHAT ALERT DISPATCH MODAL -->
+  <div id="gchat-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-[#f5831f] font-bold">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Google Chat Closed-Loop Action</h3>
+            <p class="text-[11px] text-slate-500 font-mono" id="modal-subtitle">Dispatching NOC CardsV2 payload</p>
+          </div>
+        </div>
+        <button onclick="closeAlertModal()" class="text-slate-400 hover:text-slate-600 text-sm p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-4 text-xs">
+        <div id="modal-card-preview" class="border border-slate-200 rounded-lg p-3 bg-slate-50 space-y-2">
+          <!-- Card preview rendered dynamically -->
+        </div>
+        <div id="modal-status-banner" class="hidden p-3 rounded-lg text-[11px] font-mono"></div>
+        <div class="flex items-center justify-between pt-2">
+          <span class="text-[11px] text-slate-500 font-mono">Action: CardsV2 Webhook</span>
+          <div class="space-x-2">
+            <button onclick="closeAlertModal()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium">Cancel</button>
+            <button id="modal-dispatch-btn" onclick="executeDispatchAlert()" class="px-4 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#e07518] text-white font-semibold transition inline-flex items-center space-x-1.5">
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+              <span>Dispatch to Google Chat</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

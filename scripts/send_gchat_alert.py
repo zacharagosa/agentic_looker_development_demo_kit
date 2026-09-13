@@ -196,11 +196,16 @@ def dispatch_alert(webhook_url: str, payload: dict, dry_run: bool = False) -> bo
         print(f"❌ Unexpected error while sending webhook: {str(e)}", file=sys.stderr)
         return False
 
+DEFAULT_WEBHOOK = os.getenv(
+    "GCHAT_WEBHOOK_URL",
+    "https://chat.googleapis.com/v1/spaces/AAQAmQ5X9iI/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=S39BqPJc0-f6Jx55ikAN7iQV94tJmAQSEcTrCCt8eDU"
+)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Dispatch rich Google Chat CardsV2 alerts for NOC optical network events."
     )
-    parser.add_argument("--webhook-url", default=os.getenv("GCHAT_WEBHOOK_URL", ""),
+    parser.add_argument("--webhook-url", default=DEFAULT_WEBHOOK,
                         help="Google Chat Incoming Webhook URL (or set GCHAT_WEBHOOK_URL env var)")
     parser.add_argument("--circuit-id", default="CKT-400G-CHI-DEN-0042",
                         help="Circuit identifier (e.g. CKT-400G-CHI-DEN-0042)")
