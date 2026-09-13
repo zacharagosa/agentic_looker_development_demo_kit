@@ -72,6 +72,20 @@
           <p class="text-xs text-slate-500">Autonomous Telemetry, BQML, Looker Actions & Google Chat NOC Alerting</p>
         </div>
       </div>
+
+      <!-- External Links in Top Main Header -->
+      <div class="flex items-center space-x-2.5">
+        <a href="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/dashboards/169" target="_blank"
+           class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-[#f5831f] font-semibold flex items-center space-x-1.5 transition shadow-xs">
+          <span>Open in Looker</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+        </a>
+        <a href="https://vertexaisearch.cloud.google.com/home/cid/8816aa35-65e6-45ec-b8a4-0ba394801abb/r/session/16242364684410018343?hl=en_US&_gl=1*nzewaq*_ga*MTMxNjI5ODAxNy4xNjk4MjQ2OTM3*_ga_WH2QY8WWF5*czE3ODkwODI3OTYkbzI0NCRnMSR0MTc4OTA4MjgyMCRqMzYkbDAkaDA.&pli=1" target="_blank"
+           class="text-xs px-3.5 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#ea580c] text-white font-semibold flex items-center space-x-1.5 transition shadow-xs">
+          <span>Chat in Gemini Enterprise</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -439,16 +453,7 @@
     <!-- ============================================================= -->
     <!-- TAB 3: LOOKER BI DASHBOARD -->
     <!-- ============================================================= -->
-    <div id="tab-looker" class="tab-pane hidden w-full relative">
-      <!-- Floating Open in Looker action (positioned to left of Looker's native right-hand options) -->
-      <div class="absolute top-3 right-[290px] z-10">
-        <a href="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/dashboards/169" target="_blank"
-           class="text-xs px-3.5 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#ea580c] text-white font-semibold flex items-center space-x-1.5 transition shadow-sm">
-          <span>Open in Looker</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-        </a>
-      </div>
-
+    <div id="tab-looker" class="tab-pane hidden w-full">
       <!-- Edge-to-edge Embedded Dashboard iframe -->
       <iframe src="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/embed/dashboards/169?theme=zayo_corporate&allow_login_screen=true"
               style="width: 100%; height: calc(100vh - 105px); min-height: 850px; border: 0; display: block;"
@@ -458,16 +463,7 @@
     <!-- ============================================================= -->
     <!-- TAB 5: LOOKER CONVERSATIONAL ANALYTICS -->
     <!-- ============================================================= -->
-    <div id="tab-looker-ca" class="tab-pane hidden w-full relative">
-      <!-- Floating Gemini Enterprise action (positioned to left of Looker's native right-hand options) -->
-      <div class="absolute top-3 right-[290px] z-10">
-        <a href="https://vertexaisearch.cloud.google.com/home/cid/8816aa35-65e6-45ec-b8a4-0ba394801abb/r/session/16242364684410018343?hl=en_US&_gl=1*nzewaq*_ga*MTMxNjI5ODAxNy4xNjk4MjQ2OTM3*_ga_WH2QY8WWF5*czE3ODkwODI3OTYkbzI0NCRnMSR0MTc4OTA4MjgyMCRqMzYkbDAkaDA.&pli=1" target="_blank"
-           class="text-xs px-3.5 py-1.5 rounded-lg bg-[#f5831f] hover:bg-[#ea580c] text-white font-semibold flex items-center space-x-1.5 transition shadow-sm">
-          <span>Chat in Gemini Enterprise</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-        </a>
-      </div>
-
+    <div id="tab-looker-ca" class="tab-pane hidden w-full">
       <!-- Edge-to-edge Embedded CA iframe -->
       <iframe id="looker-ca-iframe"
               src="https://3417a175-fe20-4370-974f-2f2b535340ab.looker.app/embed/conversations?ds.agent=e8e08189aefe4301b80d1dd45d444f3d&theme=zayo_corporate&allow_login_screen=true"
