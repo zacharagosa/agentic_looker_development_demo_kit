@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}{{ rep.rep_name }} — Rep Deep-Dive Analytics{% endblock %}
+
+{% block content %}
+{% set tabs = [
+  ('scorecard', 'Executive QBR Scorecard & Attainment'),
+  ('quota', 'Quota Attainment & Velocity Diagnostics'),
+  ('deals', 'Pipeline Integrity & Deal Execution Audit'),
+  ('risk',  'Account Health, Adoption & Renewal Risk')
+] %}
+
+<div class="card p-4 mb-4 bg-white border border-[#e3e6ea] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex items-center gap-3">
+    <a href="/qbr/{{ rep.rep_id }}" class="px-2.5 py-1 rounded-md bg-[#f1f3f6] hover:bg-gray-200 text-gray-700 text-[12px] font-medium transition-colors">
+      ← {{ rep.rep_name }}'s QBR Deck
+    </a>
+    <div>
+      <h1 class="text-lg font-bold font-display text-[#141A24]">{{ rep.rep_name }} — Performance &amp; Pipeline Deep Dive</h1>
+      <div class="text-[12px] text-gray-500">{{ rep.segment }} · {{ rep.region }} · Filtered automatically to single rep</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="/ask?rep={{ rep.rep_name|urlencode }}"
+       class="px-3.5 py-1.5 rounded-lg bg-[#4F46E5] hover:bg-[#4338CA] text-white text-[12px] font-medium transition-colors shadow-sm flex items-center gap-1.5">
+      <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>
+      Ask Gemini QBR Advisor about {{ rep.rep_name.split(' ')[0] }} →
+    </a>
+  </div>
+</div>
+
+<!-- 4-Column Equal Grid Dashboard Tab Switcher -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+  {% for key, label in tabs %}
+  <button data-tab="{{ key }}"
+          class="tabbtn px-3.5 py-2.5 rounded-xl text-[12.5px] border transition-all text-left truncate
+                 {{ 'bg-[#141A24] text-white border-[#141A24] font-medium shadow-sm' if key == tab else 'bg-white border-[#e3e6ea] text-gray-600 hover:bg-gray-50' }}">
+    {{ label }}
+  </button>
+  {% endfor %}
+</div>
+
+<style>
+  #frame-wrap {
+    position: relative;
+    min-height: 82vh;
+  }
+  .dive-panel {
+    width: 100%;
+    transition: opacity 0.2s ease-in-out;
+  }
+  .dive-panel.panel-inactive {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -10;
+  }
+  .dive-panel.panel-active {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+  }
+</style>
+
+<!-- Embedded Looker Dashboard Canvas Wrapper (True-width offscreen preloading, zero duplicate header bar above iframe) -->
+<div id="frame-wrap">
+  {% for key, label in tabs %}
+  <div id="panel-{{ key }}" data-key="{{ key }}" class="dive-panel {{ 'panel-active' if key == tab else 'panel-inactive' }} card overflow-hidden relative" style="height: 82vh;">
+    <div id="loader-{{ key }}" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-8 text-center">
+      <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+        <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+      </div>
+      <div class="text-[14px] font-bold text-[#141A24]">Loading {{ label }}</div>
+      <div class="text-[12px] text-gray-500 mt-1">Authenticating SSO &amp; filtering live telemetry to Sales Rep: <strong>{{ rep.rep_name }}</strong>...</div>
+    </div>
+    <iframe id="frame-{{ key }}" data-dash="{{ key }}" style="height: 82vh; width: 100%; border: 0; display: block;" allow="fullscreen"></iframe>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const REP = {{ rep.rep_name|tojson }};
+const REP_ID = {{ rep.rep_id|tojson }};
+const QUARTER = {{ quarter|default('2026-Q3')|tojson }};
+const TAB_KEYS = ['scorecard', 'quota', 'deals', 'risk'];
+const loadedTabs = {};
+let sessionInitialized = false;
+
+function nudgeIframeResize(frame) {
+  if (!frame) return;
+  try {
+    frame.style.width = '99.9%';
+    requestAnimationFrame(() => {
+      frame.style.width = '100%';
+    });
+  } catch (e) {}
+}
+
+async function loadTabIframe(key) {
+  if (loadedTabs[key]) return;
+  loadedTabs[key] = true;
+
+  const frame = document.getElementById('frame-' + key);
+  const loader = document.getElementById('loader-' + key);
+  const isFirst = !sessionInitialized;
+  sessionInitialized = true;
+
+  const params = new URLSearchParams({
+    dashboard: key,
+    rep_name: REP,
+    quarter: QUARTER,
+    embed_domain: window.location.origin,
+    init_session: isFirst ? '1' : '0'
+  });
+
+  try {
+    const r = await fetch('/api/embed?' + params);
+    const j = await r.json();
+    if (j.url) {
+      frame.onload = () => {
+        if (loader) setTimeout(() => { loader.style.display = 'none'; }, 350);
+      };
+      frame.src = j.url;
+    }
+  } catch (e) {
+    if (loader) loader.innerHTML = '<div class="text-red-600 text-sm">Could not load dashboard: ' + e.message + '</div>';
+  }
+}
+
+async function preloadAllDiveTabs() {
+  const activeKey = {{ tab|tojson }};
+  await loadTabIframe(activeKey);
+  setTimeout(async () => {
+    for (const key of TAB_KEYS) {
+      if (key !== activeKey) {
+        await loadTabIframe(key);
+        await new Promise(res => setTimeout(res, 600));
+      }
+    }
+  }, 1200);
+}
+
+function selectDiveTab(key) {
+  document.querySelectorAll('.tabbtn').forEach(x => {
+    if (x.dataset.tab === key) {
+      x.className = 'tabbtn px-3.5 py-2.5 rounded-xl text-[12.5px] border bg-[#141A24] text-white border-[#141A24] font-medium shadow-sm transition-all text-left truncate';
+    } else {
+      x.className = 'tabbtn px-3.5 py-2.5 rounded-xl text-[12.5px] border bg-white border-[#e3e6ea] text-gray-600 hover:bg-gray-50 transition-all text-left truncate';
+    }
+  });
+
+  document.querySelectorAll('.dive-panel').forEach(p => {
+    if (p.dataset.key === key) {
+      p.classList.remove('panel-inactive');
+      p.classList.add('panel-active');
+      const f = p.querySelector('iframe');
+      nudgeIframeResize(f);
+    } else {
+      p.classList.remove('panel-active');
+      p.classList.add('panel-inactive');
+    }
+  });
+
+  history.replaceState(null, '', '?tab=' + key);
+  loadTabIframe(key);
+}
+
+document.querySelectorAll('.tabbtn').forEach(b => {
+  b.onclick = () => selectDiveTab(b.dataset.tab);
+});
+
+document.addEventListener('DOMContentLoaded', preloadAllDiveTabs);
+</script>
+{% endblock %}

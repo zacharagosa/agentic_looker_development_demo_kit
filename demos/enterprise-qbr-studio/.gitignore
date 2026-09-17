@@ -1,0 +1,22 @@
+# Secrets & Environment
+.env
+.env.*
+!.env.example
+sa_key.json
+*.pem
+*.key
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Logs & OS
+logs/
+*.log
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,678 @@
+{% extends "base.html" %}
+{% block title %}{{ rep.rep_name }} — Executive QBR Deck ({{ quarter }}){% endblock %}
+
+{% block content %}
+<style>
+  .slide-panel {
+    width: 100%;
+    transition: opacity 0.18s ease-in-out;
+  }
+  .slide-active {
+    position: relative !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+  }
+  .slide-inactive {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -10 !important;
+  }
+  @media print {
+    .slide-inactive {
+      position: relative !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      z-index: 1 !important;
+      margin-bottom: 2rem !important;
+      page-break-after: always;
+    }
+  }
+</style>
+
+<!-- Executive Rep Identity & Action Bar -->
+<div class="card p-5 mb-4 bg-white border border-[#e3e6ea] shadow-sm no-print">
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div class="flex items-center gap-3.5">
+      <a href="/" class="px-2.5 py-1.5 rounded-lg bg-[#f1f3f6] hover:bg-gray-200 text-gray-700 text-[12px] font-medium transition-colors">
+        ← Global Overview
+      </a>
+      <div class="w-11 h-11 rounded-xl bg-[#141A24] text-white font-display font-bold text-base flex items-center justify-center shadow-sm border border-[#4F46E5]/40">
+        {{ rep.rep_name.split(' ')[0][0] }}{{ rep.rep_name.split(' ')[-1][0] }}
+      </div>
+      <div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <h1 class="text-xl font-bold font-display text-[#141A24]">{{ rep.rep_name }}</h1>
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20">
+            {{ rep.segment }} · {{ rep.region }}
+          </span>
+          <span class="text-xs text-gray-500">Manager: <a href="/team/{{ rep.manager_id }}" class="text-[#141A24] font-medium underline hover:text-[#4F46E5]">{{ rep.manager_name }}</a></span>
+        </div>
+        <p class="text-[12px] text-gray-500 mt-0.5">Automated Executive QBR Presentation · Grounded on live Looker <code class="text-[#141A24]">saas_qbr</code> telemetry ({{ quarter }})</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <a href="/dive/{{ rep.rep_id }}"
+         class="px-3.5 py-2 rounded-lg bg-white border border-[#d0d5dd] hover:border-[#141A24] text-[#141A24] text-[12px] font-medium transition-colors shadow-sm">
+        Interactive Deep Dive (4 Dashboards) →
+      </a>
+      <button id="btn-refresh-ai" onclick="triggerAiRefresh()"
+         class="px-3.5 py-2 rounded-lg bg-white border border-[#d0d5dd] hover:bg-gray-50 text-[#141A24] text-[12px] font-medium transition-colors flex items-center gap-1.5 shadow-sm">
+        <svg class="w-3.5 h-3.5 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>Regenerate AI Briefing</span>
+      </button>
+      <button onclick="togglePrintView()" id="btn-print-view"
+         class="px-3.5 py-2 rounded-lg bg-[#f1f3f6] hover:bg-gray-200 text-[#141A24] text-[12px] font-medium transition-colors">
+        Show All Slides
+      </button>
+      <button onclick="window.print()"
+         class="px-3.5 py-2 rounded-lg bg-[#141A24] hover:bg-[#1e293b] text-white text-[12px] font-medium transition-colors shadow-sm">
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Top KPI Summary Strip (7-Card Executive & Usage Telemetry Strip) -->
+  {% set att = f.get('attainment') or 0 %}
+  {% set att_color = '#10B981' if att >= 1.0 else ('#00C0E8' if att >= 0.8 else '#E11D48') %}
+  {% set hscore = f.get('customer_health_score') or 72 %}
+  {% set hcolor = '#10B981' if hscore >= 75 else ('#00C0E8' if hscore >= 60 else '#E11D48') %}
+  {% set utrend = (f.get('avg_usage_trend') or 0) * 100 %}
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mt-4 pt-4 border-t border-[#eef0f3]">
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">ARR Quota ({{ quarter }})</div>
+      <div class="text-lg font-bold font-display text-[#141A24] mt-0.5 kpi-value">{{ f.get('quota')|money }}</div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Closed Won ARR</div>
+      <div class="text-lg font-bold font-display text-[#10B981] mt-0.5 kpi-value">{{ f.get('won')|money }}</div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Quota Attainment</div>
+      <div class="text-lg font-bold font-display mt-0.5 kpi-value" style="color: {{ att_color }};">{{ att|pct }}</div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Open Pipeline</div>
+      <div class="text-lg font-bold font-display text-[#141A24] mt-0.5 kpi-value">{{ f.get('open_pipeline')|money }} <span class="text-[11px] font-normal text-gray-500">({{ f.get('pipeline_coverage')|num(1) }}x)</span></div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Commit ARR</div>
+      <div class="text-lg font-bold font-display text-[#4F46E5] mt-0.5 kpi-value">{{ f.get('commit_arr')|money }}</div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Customer Health</div>
+      <div class="flex items-baseline gap-1.5 mt-0.5">
+        <span class="text-lg font-bold font-display kpi-value" style="color: {{ hcolor }};">{{ hscore }}/100</span>
+        <span class="text-[11px] text-gray-500">({{ (f.get('avg_seat_utilization') or 0)|pct }} util)</span>
+      </div>
+    </div>
+    <div class="p-3 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+      <div class="text-[10.5px] font-semibold uppercase text-gray-500 truncate">Renewal ARR at Risk</div>
+      <div class="flex items-baseline gap-1.5 mt-0.5">
+        <span class="text-lg font-bold font-display text-red-600 kpi-value">{{ f.get('arr_at_risk')|money }}</span>
+        <span class="text-[10.5px] font-semibold {{ 'text-emerald-600' if utrend >= 0 else 'text-red-600' }}">
+          {{ '+' if utrend >= 0 else '' }}{{ utrend|num(1) }}% 30d
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide Deck Stepper Bar (5-Column Equal Grid so all 5 tabs fit on screen without overflowing) -->
+<div id="slide-stepper" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4 no-print">
+  <button onclick="selectSlide(0)" data-idx="0" class="slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-[#4F46E5] text-white shadow-sm flex items-center gap-2 transition-all text-left">
+    <span class="w-5 h-5 shrink-0 rounded-full bg-white/20 text-white text-[11px] flex items-center justify-center font-bold">1</span>
+    <span class="truncate">Executive Scorecard</span>
+  </button>
+  <button onclick="selectSlide(1)" data-idx="1" class="slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-white border border-[#e3e6ea] text-[#141A24] hover:bg-gray-50 flex items-center gap-2 transition-all text-left">
+    <span class="w-5 h-5 shrink-0 rounded-full bg-gray-100 text-gray-600 text-[11px] flex items-center justify-center font-bold">2</span>
+    <span class="truncate">Attainment &amp; Velocity</span>
+  </button>
+  <button onclick="selectSlide(2)" data-idx="2" class="slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-white border border-[#e3e6ea] text-[#141A24] hover:bg-gray-50 flex items-center gap-2 transition-all text-left">
+    <span class="w-5 h-5 shrink-0 rounded-full bg-gray-100 text-gray-600 text-[11px] flex items-center justify-center font-bold">3</span>
+    <span class="truncate">Pipeline Integrity</span>
+  </button>
+  <button onclick="selectSlide(3)" data-idx="3" class="slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-white border border-[#e3e6ea] text-[#141A24] hover:bg-gray-50 flex items-center gap-2 transition-all text-left">
+    <span class="w-5 h-5 shrink-0 rounded-full bg-gray-100 text-gray-600 text-[11px] flex items-center justify-center font-bold">4</span>
+    <span class="truncate">Account Health &amp; Risk</span>
+  </button>
+  <button onclick="selectSlide(4)" data-idx="4" class="slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-white border border-[#e3e6ea] text-[#141A24] hover:bg-gray-50 flex items-center gap-2 transition-all text-left">
+    <span class="w-5 h-5 shrink-0 rounded-full bg-gray-100 text-gray-600 text-[11px] flex items-center justify-center font-bold">5</span>
+    <span class="truncate">Action Plan &amp; Next Steps</span>
+  </button>
+</div>
+
+<!-- AI Live Synthesis Overlay (Hidden unless Regenerate AI is triggered) -->
+<div id="ai-synthesis-banner" class="hidden card p-4 mb-4 bg-[#141A24] text-white border border-[#4F46E5]/40 shadow-md no-print">
+  <div class="flex items-center gap-4">
+    <div class="w-8 h-8 rounded-lg bg-[#4F46E5] flex items-center justify-center animate-spin">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+    </div>
+    <div class="flex-1">
+      <div class="text-[14px] font-bold text-[#4F46E5]">Gemini 3.8 Flash Synthesis in Progress</div>
+      <div id="ai-step-text" class="text-[12px] text-gray-300 mt-0.5">Querying live Looker saas_qbr telemetry and generating grounded executive QBR narrative for {{ rep.rep_name }}...</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDES CONTAINER (Uses position: relative so offscreen preloaded slides maintain 100% full width) -->
+<div id="slides-wrapper" class="relative" style="min-height: 95vh;">
+
+  <!-- SLIDE 1: Executive Scorecard & Attainment -->
+  <section class="slide slide-panel slide-active space-y-4" data-slide="0">
+    <!-- Top Executive Narrative Card (Full Width) -->
+    <div class="card p-5 bg-white border border-[#e3e6ea] border-l-4 border-l-[#4F46E5] shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#eef0f3]">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-[#4F46E5]/10 text-[#4F46E5]">Slide 01 · Executive Scorecard</span>
+          <h2 class="text-base font-bold font-display text-[#141A24]">Executive QBR Scorecard &amp; Attainment</h2>
+        </div>
+        <div class="text-[11px] text-gray-500">
+          Looker Live Filter: <strong class="text-[#141A24]">Sales Rep = {{ rep.rep_name }}</strong> · <strong class="text-[#141A24]">Quarter = {{ quarter }}</strong>
+        </div>
+      </div>
+      <div id="nar-summary" class="prose prose-sm max-w-none text-[#141A24] leading-relaxed">{{ n.summary | safe }}</div>
+    </div>
+
+    <!-- Bottom Full-Width Live Embedded Looker Dashboard (100% Width — Never Cut Off) -->
+    <div class="card w-full bg-[#F8F9FB] relative overflow-hidden border border-[#e3e6ea] shadow-sm" style="min-height: 82vh;">
+      <div class="iframe-loader absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-6 text-center">
+        <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+          <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+        </div>
+        <div class="text-[14px] font-bold text-[#141A24]">Loading Executive QBR Scorecard &amp; Attainment</div>
+        <div class="text-[12px] text-gray-500 mt-1">Authenticating Looker embed filtered to Sales Rep: <strong>{{ rep.rep_name }}</strong> ({{ quarter }})...</div>
+      </div>
+      <iframe data-dash="scorecard" class="qbr-iframe w-full block" style="height: 82vh; width: 100%; border: none;" allow="fullscreen"></iframe>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: Quota Attainment & Velocity Diagnostics -->
+  <section class="slide slide-panel slide-inactive space-y-4" data-slide="1">
+    <!-- Top Executive Narrative Card (Full Width) -->
+    <div class="card p-5 bg-white border border-[#e3e6ea] border-l-4 border-l-[#00C0E8] shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#eef0f3]">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-[#00C0E8]/15 text-[#008ba8]">Slide 02 · Velocity Diagnostics</span>
+          <h2 class="text-base font-bold font-display text-[#141A24]">Quota Attainment &amp; Pipeline Velocity Diagnostics</h2>
+        </div>
+        <div class="text-[11px] text-gray-500">
+          Looker Live Filter: <strong class="text-[#141A24]">Sales Rep = {{ rep.rep_name }}</strong> · <strong class="text-[#141A24]">Quarter = {{ quarter }}</strong>
+        </div>
+      </div>
+      <div id="nar-attainment" class="prose prose-sm max-w-none text-[#141A24] leading-relaxed">{{ n.attainment | safe }}</div>
+    </div>
+
+    <!-- Bottom Full-Width Live Embedded Looker Dashboard (100% Width — Never Cut Off) -->
+    <div class="card w-full bg-[#F8F9FB] relative overflow-hidden border border-[#e3e6ea] shadow-sm" style="min-height: 82vh;">
+      <div class="iframe-loader absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-6 text-center">
+        <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+          <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+        </div>
+        <div class="text-[14px] font-bold text-[#141A24]">Loading Quota Attainment &amp; Pipeline Velocity Diagnostics</div>
+        <div class="text-[12px] text-gray-500 mt-1">Applying single-rep filter: <strong>{{ rep.rep_name }}</strong>...</div>
+      </div>
+      <iframe data-dash="quota" class="qbr-iframe w-full block" style="height: 82vh; width: 100%; border: none;" allow="fullscreen"></iframe>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: Pipeline Integrity & Deal Execution Audit -->
+  <section class="slide slide-panel slide-inactive space-y-4" data-slide="2">
+    <!-- Top Executive Narrative Card (Full Width) -->
+    <div class="card p-5 bg-white border border-[#e3e6ea] border-l-4 border-l-[#4F46E5] shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#eef0f3]">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-[#4F46E5]/10 text-[#4F46E5]">Slide 03 · Pipeline Integrity</span>
+          <h2 class="text-base font-bold font-display text-[#141A24]">Pipeline Integrity &amp; Deal Execution Audit</h2>
+        </div>
+        <div class="text-[11px] text-gray-500">
+          Looker Live Filter: <strong class="text-[#141A24]">Sales Rep = {{ rep.rep_name }}</strong>
+        </div>
+      </div>
+      <div id="nar-pipeline" class="prose prose-sm max-w-none text-[#141A24] leading-relaxed">{{ n.pipeline | safe }}</div>
+    </div>
+
+    <!-- Bottom Full-Width Live Embedded Looker Dashboard (100% Width — Never Cut Off) -->
+    <div class="card w-full bg-[#F8F9FB] relative overflow-hidden border border-[#e3e6ea] shadow-sm" style="min-height: 82vh;">
+      <div class="iframe-loader absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-6 text-center">
+        <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+          <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+        </div>
+        <div class="text-[14px] font-bold text-[#141A24]">Loading Pipeline Integrity &amp; Deal Execution Audit</div>
+        <div class="text-[12px] text-gray-500 mt-1">Auditing close-date slip history and stage duration for <strong>{{ rep.rep_name }}</strong>...</div>
+      </div>
+      <iframe data-dash="deals" class="qbr-iframe w-full block" style="height: 82vh; width: 100%; border: none;" allow="fullscreen"></iframe>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Account Health, Adoption & Renewal Risk -->
+  <section class="slide slide-panel slide-inactive space-y-4" data-slide="3">
+    <!-- Top Executive Narrative & Product Telemetry Scorecard Card (Full Width) -->
+    <div class="card p-5 bg-white border border-[#e3e6ea] border-l-4 border-l-[#10B981] shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#eef0f3]">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-[#10B981]/10 text-[#10B981]">Slide 04 · Product Usage Telemetry &amp; Churn Intelligence</span>
+          <h2 class="text-base font-bold font-display text-[#141A24]">Account Health, Adoption &amp; Predictive Renewal Risk</h2>
+        </div>
+        <div class="text-[11px] text-gray-500">
+          Looker Live Filter: <strong class="text-[#141A24]">Account Owner = {{ rep.rep_name }}</strong>
+        </div>
+      </div>
+
+      <!-- 4-Card Product Usage Telemetry & Churn Intelligence Strip -->
+      {% set hs = f.get('customer_health_score') or 72 %}
+      {% set hsc = '#10B981' if hs >= 75 else ('#00C0E8' if hs >= 60 else '#E11D48') %}
+      {% set ut = (f.get('avg_usage_trend') or 0) * 100 %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Card 1: Composite Customer Health Score -->
+        <div class="p-3.5 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Customer Health Score</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background: {{ hsc }}15; color: {{ hsc }};">
+              {{ 'Healthy' if hs >= 75 else ('Watch' if hs >= 60 else 'Churn Risk') }}
+            </span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span class="text-2xl font-bold font-display kpi-value" style="color: {{ hsc }};">{{ hs }}<span class="text-sm font-normal text-gray-400">/100</span></span>
+            <span class="text-[11px] text-gray-500">Avg CSAT: <strong>{{ f.get('avg_csat')|num(1) }}/5.0</strong></span>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-1">Weighted telemetry: Seat Util (30%), 30d Trend (25%), Support (15%), CSAT (15%), Renewal (15%)</div>
+        </div>
+
+        <!-- Card 2: Active Seat Utilization & Expansion Readiness -->
+        <div class="p-3.5 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Active Seat Utilization</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+              {{ f.get('expansion_ready_accounts') or 0 }} Upsell Ready (&ge;80%)
+            </span>
+          </div>
+          <div class="text-2xl font-bold font-display text-[#141A24] mt-1 kpi-value">{{ (f.get('avg_seat_utilization') or 0)|pct }}</div>
+          <div class="text-[11px] text-gray-500 mt-1">Accounts &lt;65% utilization correlate with 3.4x higher renewal churn probability</div>
+        </div>
+
+        <!-- Card 3: 30-Day Product Usage Momentum -->
+        <div class="p-3.5 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500">30d Usage Trajectory</span>
+            <span class="px-2 py-0.5 rounded {{ 'bg-red-100 text-red-700' if (f.get('declining_usage_accounts') or 0) > 0 else 'bg-emerald-100 text-emerald-700' }} text-[10px] font-bold">
+              {{ f.get('declining_usage_accounts') or 0 }} Declining Accounts
+            </span>
+          </div>
+          <div class="text-2xl font-bold font-display mt-1 kpi-value {{ 'text-emerald-600' if ut >= 0 else 'text-red-600' }}">
+            {{ '+' if ut >= 0 else '' }}{{ ut|num(1) }}% <span class="text-xs font-normal text-gray-500">MoM Active Users</span>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-1">Compares active users (30d vs prior 30d) across Core Platform, Cloud Suite &amp; AI Copilot</div>
+        </div>
+
+        <!-- Card 4: Renewal Churn Exposure & Support Friction -->
+        <div class="p-3.5 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Predictive Churn Risk</span>
+            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">
+              {{ f.get('total_tickets_90d') or 0 }} Tickets (90d)
+            </span>
+          </div>
+          <div class="text-2xl font-bold font-display text-red-600 mt-1 kpi-value">{{ f.get('arr_at_risk')|money }}</div>
+          <div class="text-[11px] text-gray-500 mt-1">Across <strong>{{ f.get('high_risk_accounts') or 0 }} high-risk accounts</strong> out of {{ f.get('total_accounts') or 0 }} active accounts</div>
+        </div>
+      </div>
+
+      <div id="nar-risk" class="prose prose-sm max-w-none text-[#141A24] leading-relaxed pt-2 border-t border-[#eef0f3]">{{ n.risk | safe }}</div>
+    </div>
+
+    <!-- Bottom Full-Width Live Embedded Looker Dashboard (100% Width — Never Cut Off) -->
+    <div class="card w-full bg-[#F8F9FB] relative overflow-hidden border border-[#e3e6ea] shadow-sm" style="min-height: 82vh;">
+      <div class="iframe-loader absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-6 text-center">
+        <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+          <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+        </div>
+        <div class="text-[14px] font-bold text-[#141A24]">Loading Account Health, Adoption &amp; Renewal Risk</div>
+        <div class="text-[12px] text-gray-500 mt-1">Filtering product usage &amp; churn telemetry for Account Owner: <strong>{{ rep.rep_name }}</strong>...</div>
+      </div>
+      <iframe data-dash="risk" class="qbr-iframe w-full block" style="height: 82vh; width: 100%; border: none;" allow="fullscreen"></iframe>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: Executive Action Plan & Deal Inspection Tables -->
+  <section class="slide slide-panel slide-inactive card p-6 bg-white border border-[#e3e6ea]" data-slide="4">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-[#4F46E5]/10 text-[#4F46E5]">Slide 05 · Action Plan</span>
+      <span class="text-[12px] font-semibold uppercase tracking-wider text-gray-400">Next Quarter Commitments &amp; Deal / Usage Action Matrix</span>
+    </div>
+    <h2 class="text-xl font-bold font-display text-[#141A24] mb-4">Action Plan &amp; Next Quarter Commitments</h2>
+    <div id="nar-actions" class="prose max-w-none text-[#141A24] leading-relaxed mb-8 p-5 rounded-xl bg-[#F8F9FB] border border-[#e3e6ea]">{{ n.actions | safe }}</div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Top Open Opportunities Table -->
+      <div class="border border-[#e3e6ea] rounded-xl overflow-hidden">
+        <div class="px-4 py-3 bg-[#141A24] text-white flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider">Priority Open Deals Under Inspection</span>
+          <span class="text-[11px] text-[#4F46E5] font-semibold">{{ (f.deals or [])|length }} Opportunities</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#F8F9FB] border-b border-[#e3e6ea] text-gray-500 uppercase text-[10px]">
+              <tr>
+                <th class="py-2.5 px-3">Opportunity</th>
+                <th class="py-2.5 px-3">Stage</th>
+                <th class="py-2.5 px-3 text-right">ARR</th>
+                <th class="py-2.5 px-3 text-center">Slips</th>
+                <th class="py-2.5 px-3">Audit Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#eef0f3]">
+              {% for d in (f.deals or [])[:6] %}
+              <tr class="hover:bg-gray-50">
+                <td class="py-2.5 px-3 font-medium text-[#141A24]">{{ d.get('qbr_deal_quality.opportunity_name') }}</td>
+                <td class="py-2.5 px-3 text-gray-600">{{ d.get('qbr_deal_quality.stage_name') }}</td>
+                <td class="py-2.5 px-3 text-right font-semibold kpi-value">{{ d.get('qbr_deal_quality.open_arr')|money }}</td>
+                <td class="py-2.5 px-3 text-center">{{ d.get('qbr_deal_quality.slip_count') or 0 }}</td>
+                <td class="py-2.5 px-3">
+                  {% set flag = d.get('qbr_deal_quality.risk_band') or 'Healthy' %}
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold
+                    {{ 'bg-red-100 text-red-700' if 'High' in flag or 'Zombie' in flag else ('bg-amber-100 text-amber-800' if 'Watch' in flag or 'Medium' in flag else 'bg-emerald-100 text-emerald-700') }}">
+                    {{ flag }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- High-Risk & Expansion Customer Telemetry Table -->
+      <div class="border border-[#e3e6ea] rounded-xl overflow-hidden">
+        <div class="px-4 py-3 bg-[#141A24] text-white flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider">Customer Usage Telemetry &amp; Churn Watchlist</span>
+          <span class="text-[11px] text-[#00C0E8] font-semibold">{{ (f.accounts or [])|length }} Accounts Monitored</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#F8F9FB] border-b border-[#e3e6ea] text-gray-500 uppercase text-[10px]">
+              <tr>
+                <th class="py-2.5 px-3">Account</th>
+                <th class="py-2.5 px-3 text-right">ARR</th>
+                <th class="py-2.5 px-3 text-right">Seat Util %</th>
+                <th class="py-2.5 px-3 text-right">30d Trend</th>
+                <th class="py-2.5 px-3 text-center">Health</th>
+                <th class="py-2.5 px-3 text-center">Telemetry Signal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#eef0f3]">
+              {% for a in (f.accounts or [])[:6] %}
+              {% set util = (a.get('qbr_account_risk.utilization_pct') or 0) * 100 %}
+              {% set trend = (a.get('qbr_account_risk.usage_trend_pct') or 0) * 100 %}
+              {% set rscore = a.get('qbr_account_risk.risk_score') or 25 %}
+              {% set acct_health = [0, [100, (100 - rscore)|int]|min]|max %}
+              {% set tier = a.get('qbr_account_risk.risk_band') or 'Healthy' %}
+              <tr class="hover:bg-gray-50">
+                <td class="py-2.5 px-3 font-medium text-[#141A24]">
+                  <div>{{ a.get('qbr_account_risk.account_name') }}</div>
+                  <div class="text-[10px] text-gray-400">Renews in {{ a.get('qbr_account_risk.days_to_renewal') or 0 }}d</div>
+                </td>
+                <td class="py-2.5 px-3 text-right font-semibold kpi-value">{{ a.get('qbr_account_risk.total_active_arr')|money }}</td>
+                <td class="py-2.5 px-3 text-right kpi-value">
+                  <div class="font-semibold {{ 'text-emerald-600' if util >= 80 else ('text-amber-600' if util >= 60 else 'text-red-600') }}">{{ util|num(0) }}%</div>
+                  <div class="text-[10px] text-gray-400">{{ a.get('qbr_account_risk.active_users_30d') or 0 }}/{{ a.get('qbr_account_risk.named_users') or 0 }} seats</div>
+                </td>
+                <td class="py-2.5 px-3 text-right font-semibold kpi-value {{ 'text-emerald-600' if trend >= 0 else 'text-red-600' }}">
+                  {{ '+' if trend >= 0 else '' }}{{ trend|num(1) }}%
+                </td>
+                <td class="py-2.5 px-3 text-center font-bold kpi-value {{ 'text-emerald-600' if acct_health >= 75 else ('text-amber-600' if acct_health >= 55 else 'text-red-600') }}">
+                  {{ acct_health }}/100
+                </td>
+                <td class="py-2.5 px-3 text-center">
+                  {% if util >= 80 and 'High' not in tier %}
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Upsell Ready</span>
+                  {% else %}
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold
+                    {{ 'bg-red-100 text-red-700' if 'High' in tier else ('bg-amber-100 text-amber-800' if 'Watch' in tier else 'bg-emerald-100 text-emerald-700') }}">
+                    {{ tier }}
+                  </span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const REP = {{ rep.rep_name|tojson }};
+const REP_ID = {{ rep.rep_id|tojson }};
+const QUARTER = {{ quarter|tojson }};
+
+let currentSlide = 0;
+let allSlidesVisible = false;
+const loadedDashboards = {};
+let sessionInitialized = false;
+
+function nudgeIframeResize(sec) {
+  const frame = sec.querySelector('iframe.qbr-iframe');
+  if (!frame) return;
+  // Nudge iframe width slightly and restore on next frame so Looker's ResizeObserver recalculates 100% layout
+  frame.style.width = '99.9%';
+  requestAnimationFrame(() => {
+    frame.style.width = '100%';
+    try {
+      if (frame.contentWindow) {
+        frame.contentWindow.postMessage(JSON.stringify({ type: 'resize' }), '*');
+      }
+    } catch (e) {}
+  });
+}
+
+function selectSlide(idx) {
+  currentSlide = idx;
+  allSlidesVisible = false;
+  document.getElementById('btn-print-view').textContent = 'Show All Slides';
+
+  document.querySelectorAll('.slide-tab').forEach((btn, i) => {
+    const badge = btn.querySelector('span:first-child');
+    if (i === idx) {
+      btn.className = 'slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-[#4F46E5] text-white shadow-sm flex items-center gap-2 transition-all text-left';
+      if (badge) badge.className = 'w-5 h-5 shrink-0 rounded-full bg-white/20 text-white text-[11px] flex items-center justify-center font-bold';
+    } else {
+      btn.className = 'slide-tab px-3 py-2.5 rounded-xl text-[12.5px] font-medium bg-white border border-[#e3e6ea] text-[#141A24] hover:bg-gray-50 flex items-center gap-2 transition-all text-left';
+      if (badge) badge.className = 'w-5 h-5 shrink-0 rounded-full bg-gray-100 text-gray-600 text-[11px] flex items-center justify-center font-bold';
+    }
+  });
+
+  document.querySelectorAll('section.slide').forEach((sec, i) => {
+    if (i === idx) {
+      sec.classList.remove('slide-inactive');
+      sec.classList.add('slide-active');
+      loadSlideIframe(sec);
+      setTimeout(() => nudgeIframeResize(sec), 60);
+    } else {
+      sec.classList.remove('slide-active');
+      sec.classList.add('slide-inactive');
+    }
+  });
+}
+
+function togglePrintView() {
+  allSlidesVisible = !allSlidesVisible;
+  const btn = document.getElementById('btn-print-view');
+  if (allSlidesVisible) {
+    btn.textContent = 'Single Slide View';
+    document.querySelectorAll('section.slide').forEach(sec => {
+      sec.classList.remove('slide-inactive');
+      sec.classList.add('slide-active');
+      sec.style.marginBottom = '2.5rem';
+      nudgeIframeResize(sec);
+    });
+    loadAllIframesSequentially();
+  } else {
+    document.querySelectorAll('section.slide').forEach(sec => {
+      sec.style.marginBottom = '';
+    });
+    selectSlide(currentSlide);
+  }
+}
+
+async function loadSlideIframe(sectionEl) {
+  const frame = sectionEl.querySelector('iframe.qbr-iframe');
+  if (!frame) return;
+  const dashKey = frame.getAttribute('data-dash');
+  if (loadedDashboards[dashKey]) {
+    nudgeIframeResize(sectionEl);
+    return;
+  }
+  loadedDashboards[dashKey] = true;
+
+  const loader = sectionEl.querySelector('.iframe-loader');
+  const isFirst = !sessionInitialized;
+  sessionInitialized = true;
+
+  const params = new URLSearchParams({
+    dashboard: dashKey,
+    rep_name: REP,
+    quarter: QUARTER,
+    embed_domain: window.location.origin,
+    init_session: isFirst ? '1' : '0'
+  });
+
+  try {
+    const r = await fetch('/api/embed?' + params);
+    const j = await r.json();
+    if (j.url) {
+      frame.onload = () => {
+        if (loader) setTimeout(() => { loader.style.display = 'none'; }, 350);
+        setTimeout(() => nudgeIframeResize(sectionEl), 150);
+      };
+      frame.src = j.url;
+    }
+  } catch (e) {
+    if (loader) loader.innerHTML = '<div class="text-red-600 text-sm">Failed to load dashboard: ' + e.message + '</div>';
+  }
+}
+
+async function loadAllIframesSequentially() {
+  const sections = Array.from(document.querySelectorAll('section.slide'));
+  for (const sec of sections) {
+    const frame = sec.querySelector('iframe.qbr-iframe');
+    if (!frame) continue;
+    const dashKey = frame.getAttribute('data-dash');
+    if (loadedDashboards[dashKey]) continue;
+
+    await new Promise(resolve => {
+      const loader = sec.querySelector('.iframe-loader');
+      const isFirst = !sessionInitialized;
+      sessionInitialized = true;
+      loadedDashboards[dashKey] = true;
+
+      const params = new URLSearchParams({
+        dashboard: dashKey,
+        rep_name: REP,
+        quarter: QUARTER,
+        embed_domain: window.location.origin,
+        init_session: isFirst ? '1' : '0'
+      });
+
+      fetch('/api/embed?' + params)
+        .then(r => r.json())
+        .then(j => {
+          if (j.url) {
+            frame.onload = () => {
+              if (loader) loader.style.display = 'none';
+              setTimeout(() => nudgeIframeResize(sec), 150);
+              resolve();
+            };
+            frame.src = j.url;
+            setTimeout(resolve, 4000);
+          } else {
+            resolve();
+          }
+        })
+        .catch(() => resolve());
+    });
+  }
+}
+
+async function triggerAiRefresh() {
+  const banner = document.getElementById('ai-synthesis-banner');
+  const stepText = document.getElementById('ai-step-text');
+  const btn = document.getElementById('btn-refresh-ai');
+  banner.classList.remove('hidden');
+  btn.disabled = true;
+
+  const steps = [
+    "Step 1/4: Querying live Looker saas_qbr metrics for " + REP + "...",
+    "Step 2/4: Auditing Commit & Upside deal velocity and slip counts...",
+    "Step 3/4: Evaluating Core Platform / Cloud Suite / AI Copilot customer adoption & renewal risk...",
+    "Step 4/4: Synthesizing executive QBR briefing via Gemini 3.8 Flash..."
+  ];
+  let stepIdx = 0;
+  const timer = setInterval(() => {
+    stepIdx = (stepIdx + 1) % steps.length;
+    stepText.textContent = steps[stepIdx];
+  }, 3500);
+
+  try {
+    const r = await fetch('/api/qbr-narrative/' + encodeURIComponent(REP_ID) + '?refresh=1');
+    const j = await r.json();
+    if (j.narrative) {
+      if (j.narrative.summary) document.getElementById('nar-summary').innerHTML = j.narrative.summary;
+      if (j.narrative.attainment) document.getElementById('nar-attainment').innerHTML = j.narrative.attainment;
+      if (j.narrative.pipeline) document.getElementById('nar-pipeline').innerHTML = j.narrative.pipeline;
+      if (j.narrative.risk) document.getElementById('nar-risk').innerHTML = j.narrative.risk;
+      if (j.narrative.actions) document.getElementById('nar-actions').innerHTML = j.narrative.actions;
+    }
+  } catch (e) {
+    console.error("AI refresh error:", e);
+  } finally {
+    clearInterval(timer);
+    banner.classList.add('hidden');
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const firstSec = document.querySelector('section.slide[data-slide="0"]');
+  if (firstSec) {
+    const frame = firstSec.querySelector('iframe.qbr-iframe');
+    const loader = firstSec.querySelector('.iframe-loader');
+    loadedDashboards['scorecard'] = true;
+    sessionInitialized = true;
+
+    const params = new URLSearchParams({
+      dashboard: 'scorecard',
+      rep_name: REP,
+      quarter: QUARTER,
+      embed_domain: window.location.origin,
+      init_session: '1'
+    });
+    fetch('/api/embed?' + params)
+      .then(r => r.json())
+      .then(j => {
+        if (j.url) {
+          frame.onload = () => {
+            if (loader) setTimeout(() => { loader.style.display = 'none'; }, 350);
+            setTimeout(() => nudgeIframeResize(firstSec), 150);
+            setTimeout(loadAllIframesSequentially, 800);
+          };
+          frame.src = j.url;
+        }
+      });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}QBR Studio{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Google Sans Text','Inter','system-ui','sans-serif'],
+                      display: ['Google Sans','Google Sans Text','system-ui','sans-serif'] },
+        colors: { brand: { 50:'#FFF2EE',100:'#FFE4DB',500:'#4F46E5',600:'#4F46E5',700:'#C43B18' } }
+      }}
+    }
+  </script>
+  <style>
+    body { background:#f8f9fb; color:#1f1f1f; }
+    .card { background:#fff; border:1px solid #e3e6ea; border-radius:14px; }
+    .kpi-value { font-variant-numeric: tabular-nums; letter-spacing:-0.02em; }
+    iframe { border:0; width:100%; display:block; border-radius:12px; }
+    @media print {
+      .no-print { display:none !important; }
+      .slide { break-after: page; border:0 !important; box-shadow:none !important; }
+      body { background:#fff; }
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body class="font-sans antialiased">
+
+<header class="no-print sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-[#e3e6ea]">
+  <div class="max-w-[1440px] mx-auto px-6 h-14 flex items-center gap-6">
+    <a href="/" class="font-display font-bold text-[15px] tracking-tight flex items-center gap-2">
+      <svg class="h-6 aspect-square" viewBox="0 0 100 100" fill="#4F46E5"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+      CloudScale Enterprise <span class="text-brand-600">|</span> Global Revenue Operations — Automated QBR Intelligence
+      <span class="font-normal text-gray-500 ml-2" style="color: #64748B;">{{ quarter }}</span>
+    </a>
+    <nav class="flex items-center gap-2 text-[13px] ml-auto">
+      <a href="/"
+         class="px-3 py-1.5 rounded-lg hover:bg-gray-100 {{ 'bg-gray-100 font-medium text-[#141A24]' if request.path == '/' else 'text-gray-600' }}">
+        Executive Overview
+      </a>
+      <a href="/ask"
+         class="px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all {{ 'bg-[#141A24] text-white font-medium shadow-sm' if request.path == '/ask' else 'bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20 font-medium border border-[#4F46E5]/20' }}">
+        <svg class="w-4 h-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>
+        Ask Gemini QBR Advisor
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-[1440px] mx-auto px-6 py-6">
+  {% block content %}{% endblock %}
+</main>
+
+{% if request.path != '/ask' %}
+<!-- Bottom-Right Floating Gemini QBR Advisor Launcher (Never overlaps Looker's top-right toolbar icons) -->
+<a href="/ask" class="fixed bottom-5 right-6 z-40 no-print px-4 py-2.5 rounded-full bg-[#141A24] hover:bg-[#1e293b] text-white shadow-lg border border-[#4F46E5]/40 text-[13px] font-medium flex items-center gap-2 transition-transform hover:scale-105">
+  <svg class="w-4 h-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>
+  <span>Ask Gemini QBR Advisor</span>
+</a>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
