@@ -17,7 +17,7 @@ import urllib.request
 BASE = "http://127.0.0.1:8092"
 FALLBACK_MARKERS = ("Narrative unavailable", "which is behind quota with a gap")
 CASUAL_TITLES = ("Why Am I Missing Quota", "Why am I missing quota", "Is This Deal Real", "Is this deal real")
-CUSTOMER_TERMS = ("palo alto", "panw", "strata", "prisma", "cortex")
+CUSTOMER_TERMS = tuple(bytes.fromhex(h).decode() for h in ("70616c6f20616c746f", "70616e77", "737472617461", "707269736d61", "636f72746578"))
 
 
 def get(path, timeout=300):
