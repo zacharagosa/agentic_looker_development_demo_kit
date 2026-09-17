@@ -1,0 +1,23 @@
+# Secrets & Environment
+.env
+.env.*
+!.env.example
+_disabled_auth/
+sa_key.json
+*.pem
+*.key
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+*.log
+logs/
