@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ mgr.manager_name }} — Regional Team QBR Roll-Up{% endblock %}
+
+{% block content %}
+<div class="card p-4 mb-5 bg-white border border-[#e3e6ea] shadow-sm no-print flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex items-center gap-3 flex-wrap">
+    <a href="/" class="px-2.5 py-1 rounded-md bg-[#f1f3f6] hover:bg-gray-200 text-gray-700 text-[12px] font-medium transition-colors">
+      ← Global Overview
+    </a>
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="text-xl font-bold font-display text-[#141A24]">{{ mgr.manager_name }}</h1>
+        <span class="px-2.5 py-0.5 rounded bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20 text-[11px] font-semibold">
+          {{ mgr.team_name }} · {{ f.headcount|num(0) }} quota-carrying reps
+        </span>
+      </div>
+      <div class="text-[12px] text-gray-500 mt-0.5">Regional Team Performance &amp; Quota Roll-Up ({{ quarter }})</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="?refresh=1" class="px-3 py-1.5 rounded-lg bg-white border border-[#d0d5dd] shadow-sm text-[12px] font-medium text-[#141A24] hover:bg-gray-50 flex items-center gap-1.5">
+      <svg class="w-3.5 h-3.5 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      Regenerate AI Briefing
+    </a>
+    <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-[#141A24] hover:bg-[#1e293b] text-white text-[12px] font-medium">
+      Export PDF
+    </button>
+  </div>
+</div>
+
+<div class="space-y-4">
+  <!-- Top Full-Width Executive Briefing Card for Manager & Team Roster -->
+  <div class="card p-5 bg-white border border-[#e3e6ea] border-l-4 border-l-[#4F46E5] shadow-sm">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Column 1: Manager Briefing -->
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#4F46E5]/10 text-[#4F46E5]">Executive Summary</span>
+          <span class="text-[11px] font-semibold text-gray-500">Gemini Manager Briefing</span>
+        </div>
+        <h3 class="text-base font-bold font-display text-[#141A24] mb-2">Regional Team Assessment</h3>
+        <div class="prose prose-sm max-w-none text-[#141A24] leading-relaxed">{{ n.team_summary | safe }}</div>
+      </div>
+
+      <!-- Column 2: Recommended Manager Actions -->
+      <div class="border-t lg:border-t-0 lg:border-l border-[#e3e6ea] pt-4 lg:pt-0 lg:pl-6">
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#4F46E5]/10 text-[#4F46E5]">Action Plan</span>
+          <span class="text-[11px] font-semibold text-gray-500">Coaching &amp; Deal Intervention</span>
+        </div>
+        <h3 class="text-base font-bold font-display text-[#141A24] mb-2">Recommended Manager Actions</h3>
+        <div class="prose prose-sm max-w-none text-[#141A24] leading-relaxed">{{ n.team_actions | safe }}</div>
+      </div>
+
+      <!-- Column 3: Team Roster Quick Jump -->
+      <div class="border-t lg:border-t-0 lg:border-l border-[#e3e6ea] pt-4 lg:pt-0 lg:pl-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#4F46E5]/10 text-[#4F46E5]">Direct Reports ({{ f.headcount|num(0) }} Reps)</span>
+          <span class="text-[11px] font-semibold text-gray-500">Click rep for individual QBR Deck</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-1">
+          {% for r in f.reps %}
+          {% set ra = r['qbr_rep_quota.arr_attainment'] or 0 %}
+          {% set rc = '#10B981' if ra >= 1 else ('#00C0E8' if ra >= 0.8 else '#E11D48') %}
+          <a href="/qbr/{{ r['qbr_rep_roster.rep_id'] }}" class="px-2.5 py-1.5 text-[12px] rounded-lg bg-[#f8f9fb] border border-[#e3e6ea] hover:border-[#4F46E5] hover:bg-white transition-all flex items-center justify-between">
+            <span class="font-medium text-[#141A24] truncate mr-2">{{ r['qbr_rep_roster.rep_name'] }}</span>
+            <span class="font-bold kpi-value shrink-0" style="color: {{ rc }};">{{ ra|pct }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom 100% Full-Width Embedded Looker Team Dashboard (No duplicate header bar above iframe) -->
+  <section class="slide card w-full bg-[#F8F9FB] relative overflow-hidden" style="height: 83vh;">
+    <div id="team-loader" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F8F9FB] p-8 text-center">
+      <div class="w-10 h-10 rounded-xl bg-[#4F46E5]/10 border border-[#4F46E5]/30 flex items-center justify-center mb-3 animate-pulse">
+        <svg class="w-5 h-5 text-[#4F46E5]" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z"/></svg>
+      </div>
+      <div class="text-[14px] font-bold text-[#141A24]">Loading Regional Team Performance &amp; Quota Roll-Up</div>
+      <div class="text-[12px] text-gray-500 mt-1">Authenticating SSO &amp; filtering live Looker dashboard to Manager: <strong>{{ mgr.manager_name }}</strong>...</div>
+    </div>
+    <iframe id="team-frame" data-dash="team" class="qbr-iframe w-full h-full block" style="height: 83vh; width: 100%; border:none;" allow="fullscreen"></iframe>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const MGR = {{ mgr.manager_name|tojson }};
+const QUARTER = {{ quarter|tojson }};
+
+async function loadTeamEmbed() {
+  const frame = document.getElementById('team-frame');
+  const loader = document.getElementById('team-loader');
+  const params = new URLSearchParams({
+    dashboard: 'team',
+    manager_name: MGR,
+    quarter: QUARTER,
+    embed_domain: window.location.origin,
+    init_session: '1'
+  });
+  try {
+    const r = await fetch('/api/embed?' + params);
+    const j = await r.json();
+    if (j.url) {
+      frame.onload = () => {
+        if (loader) setTimeout(() => { loader.style.display = 'none'; }, 350);
+      };
+      // Assign directly without mutating signed URL
+      frame.src = j.url;
+    }
+  } catch (e) {
+    if (loader) loader.innerHTML = '<div class="text-red-600 text-sm">Error loading dashboard: ' + e.message + '</div>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadTeamEmbed);
+</script>
+{% endblock %}
